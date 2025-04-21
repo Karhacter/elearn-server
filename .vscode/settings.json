@@ -1,0 +1,8 @@
+{
+    "editor.find.addExtraSpaceOnTop": true,
+    "editor.find.cursorMoveOnType": true,
+    "editor.minimap.enabled": true,
+    "editor.minimap.scale": 1,
+    "scm.autoReveal": true,
+    "files.eol": "\n"
+}
