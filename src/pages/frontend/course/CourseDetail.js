@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CourseService from "../../../services/CourseService";
 import { urlImage } from "../../../config";
+import CartService from "../../../services/CartService";
 
 import Image3 from "../../../asset/images/shape/3.png";
 import Image4 from "../../../asset/images/shape/4.png";
@@ -29,6 +30,24 @@ const CourseDetail = () => {
     convertedHourElement.innerHTML = `<i class="fa-regular fa-clock"></i> ${hours}h ${minutes}m`;
   };
 
+  const handleAddToCart = async () => {
+    const userId = localStorage.getItem("sessionToken"); // đảm bảo bạn lưu user id khi login
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng!");
+      window.location.href = "/";
+      return;
+    }
+    try {
+      const res = await CartService.addToCart();
+      if (res) {
+        alert("✅ Đã thêm vào giỏ hàng!");
+        window.location.href = "/cart";
+      }
+    } catch (err) {
+      console.error("❌ Lỗi khi thêm vào giỏ hàng:", err);
+      alert("❌ Không thể thêm vào giỏ hàng");
+    }
+  };
   return (
     <>
       <div className="page-title-area">
@@ -86,8 +105,13 @@ const CourseDetail = () => {
                     src={Image}
                     alt="Card image cap"
                   />
+
                   <div className="card-body">
-                    <Link href="#" className="btn btn-primary">
+                    <Link
+                      href="#"
+                      className="btn btn-primary"
+                      onClick={() => handleAddToCart(course.id)}
+                    >
                       Thêm Vào
                     </Link>
                     <Link href="#" className="btn btn-danger ms-2">
@@ -102,7 +126,7 @@ const CourseDetail = () => {
                   <div class="card-body">
                     {/* Infor course */}
                     <div className="row">
-                      <h3>Thông Tin Khóa Học</h3>
+                      <h2>Thông Tin Khóa Học</h2>
                       <div className="col">
                         <p className="card-text">
                           <i className="fa-regular fa-clock"></i>{" "}

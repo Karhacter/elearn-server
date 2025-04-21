@@ -60,8 +60,11 @@ const Cart = () => {
   };
 
   return (
-    <div className="container my-5">
-      <h1 className="text-center mb-4">Your Cart</h1>
+    <>
+    <div className="page-title-area">
+      <h1 className="font-bold text-danger">Your Cart</h1>
+    </div>
+    <div className="container my-5   ">
       <div className="table-responsive">
         <table className="table table-bordered table-hover text-center">
           <thead className="table-dark">
@@ -137,8 +140,8 @@ const Cart = () => {
       </div>
 
       <div className="d-flex justify-content-between mt-4">
-        <Link to="/home/product-all" className="btn btn-outline-primary">
-          Continue Shopping
+        <Link to="/home/course" className="btn btn-outline-primary">
+          Continue Select ?
         </Link>
         <div>
           <h4>Subtotal: ${subtotal.toFixed(2)}</h4>
@@ -153,6 +156,8 @@ const Cart = () => {
         </div>
       </div>
     </div>
+    </>
+   
   );
 };
 

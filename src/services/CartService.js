@@ -1,8 +1,8 @@
 import httpAxios from "../httpAxios";
 
 const CartService = {
-  addToCart: async (id, qty) => {
-    return await httpAxios.post(`cart/add_to_cart/${id}`, { qty });
+  addToCart: async () => {
+    return await httpAxios.post("cart/add-item");
   },
 
   getCart: async () => {
