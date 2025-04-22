@@ -20,10 +20,9 @@ const UserList = () => {
 
   const handleDelete = async (id) => {
     const result = await UserService.remove(id);
-    if (result.status === true) {
-      alert(result.message);
+    if (result) {
+      alert("Xóa Tài Khoản Thành Công");
       setInsertId(result.users.insertId);
-      window.location.reload();
     }
   };
   return (

@@ -6,56 +6,112 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState(null);
   const [cartCount, setCartCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  
   useEffect(() => {
-    fetchCartItems(); // Fetch cart items on mount
+    fetchCart(); 
   }, []);
 
-  const fetchCartItems = async () => {
+  const fetchCart = async () => {
+    setLoading(true);
     try {
       const data = await CartService.getCart();
-      if (data?.product?.length) {
-        setCartItems(data.product);
-        calculateCartCount(data.product);
+      if (data) {
+        setCart(data);
+        calculateCartCount(data.Items || []);
       } else {
-        setCartItems([]);
+        setCart(null);
         setCartCount(0);
       }
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching cart:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const calculateCartCount = (items) => {
-    const count = items.reduce((total, item) => total + item.qty, 0);
+    const count = items.reduce((total, item) => total + item.Quantity, 0);
     setCartCount(count);
   };
-
-  const addToCart = async (product) => {
-    await CartService.addItem(product);
-    fetchCartItems(); // Refetch the cart items after adding
+  const addToCart = async (courseId, quantity = 1) => {
+    setLoading(true);
+    try {
+      await CartService.addItem(courseId, quantity);
+      await fetchCart(); // Refresh the entire cart
+    } catch (err) {
+      setError(err.message);
+      throw err; // Re-throw to handle in components
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateCartItem = async (product_id, quantity) => {
-    await CartService.updateCartItem(product_id, { qty: quantity });
-    fetchCartItems(); // Refetch the cart items after updating
+  const updateCartItem = async (courseId, quantity) => {
+    if (quantity < 1) {
+      await removeCartItem(courseId);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // You'll need to implement this in CartService
+      await CartService.updateCartItem(courseId, quantity);
+      await fetchCart();
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeCartItem = async (product_id) => {
-    await CartService.delete(product_id);
-    fetchCartItems(); // Refetch the cart items after removal
+  const removeCartItem = async (courseId) => {
+    setLoading(true);
+    try {
+      // You'll need to implement this in CartService
+      await CartService.removeItem(courseId);
+      await fetchCart();
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearCart = async () => {
+    setLoading(true);
+    try {
+      // You'll need to implement this in CartService
+      await CartService.clearCart();
+      setCart(null);
+      setCartCount(0);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
+        cart,
         cartCount,
+        loading,
+        error,
         addToCart,
         updateCartItem,
         removeCartItem,
+        clearCart,
+        refreshCart: fetchCart
       }}
     >
       {children}

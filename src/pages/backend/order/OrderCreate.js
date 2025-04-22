@@ -16,11 +16,12 @@ const OrderList = () => {
     })();
   }, [insertId]);
 
-  const handleDelete = async (id) => {
-    const result = await OrderService.remove(id);
-
-    alert("Xóa Thành Công");
-    setInsertId(result.insertId);
+  const handleDelete = async (orderId) => {
+    const result = await OrderService.remove(orderId);
+    if (result) {
+      alert(result.message);
+      setInsertId(result.insertId);
+    }
   };
   return (
     <div className="maincontent">
@@ -67,6 +68,35 @@ const OrderList = () => {
             </select>
             <button className="btnfilter">Lọc</button>
           </div>
+          <div className="col-md-4 text-end">
+            <nav aria-label="Page navigation example">
+              <ul className="pagination pagination-sm justify-content-end">
+                <li className="page-item disabled">
+                  <Link className="page-link">&laquo;</Link>
+                </li>
+                <li className="page-item">
+                  <Link className="page-link" href="#">
+                    1
+                  </Link>
+                </li>
+                <li className="page-item">
+                  <Link className="page-link" href="#">
+                    2
+                  </Link>
+                </li>
+                <li className="page-item">
+                  <Link className="page-link" href="#">
+                    3
+                  </Link>
+                </li>
+                <li className="page-item">
+                  <Link className="page-link" href="#">
+                    &raquo;
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </section>
       <section className="content-body my-2">
@@ -93,23 +123,23 @@ const OrderList = () => {
                     </td>
                     <td>
                       <div className="name">
-                        <Link href="#">{order.name}</Link>
+                        <Link href="#">{order.deliveryname}</Link>
                       </div>
                     </td>
-                    <td>{order.phone}</td>
-                    <td>{order.email}</td>
-                    <td>{order.createdAt}</td>
+                    <td>{order.deliveryphone}</td>
+                    <td>{order.deliveryemail}</td>
+                    <td>{order.created_at}</td>
                     <td>
                       <Link
                         className="px-1 me-1 text-primary"
-                        to={"/admin/order/edit/" + order.id}
+                        to={"/admin/order/edit/" + order.orderId}
                       >
                         <i className="btn btn btn-primary fa fa-edit"></i>
                       </Link>
                       <Link className="px-1 me-1 text-danger">
                         <i
                           className="btn btn btn-danger fa fa-trash"
-                          onClick={() => handleDelete(order.orderID)}
+                          onClick={() => handleDelete(order.orderId)}
                         ></i>
                       </Link>
                     </td>

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CourseService from "../../../services/CourseService";
 import { urlImage } from "../../../config";
 import CartService from "../../../services/CartService";
+import UserService from "../../../services/UserService";
 
 import Image3 from "../../../asset/images/shape/3.png";
 import Image4 from "../../../asset/images/shape/4.png";
@@ -31,23 +32,28 @@ const CourseDetail = () => {
   };
 
   const handleAddToCart = async () => {
-    const userId = localStorage.getItem("sessionToken"); // đảm bảo bạn lưu user id khi login
-    if (!userId) {
+    const storedUserId = localStorage.getItem("sessionToken");
+    if (!storedUserId) {
       alert("Bạn cần đăng nhập để thêm vào giỏ hàng!");
       window.location.href = "/";
       return;
     }
+
     try {
-      const res = await CartService.addToCart();
-      if (res) {
-        alert("✅ Đã thêm vào giỏ hàng!");
-        window.location.href = "/cart";
+      const response = await UserService.checkAuth();
+      if (response) {
+        const userId = response.userId; // just use local variable
+        const res = await CartService.addToCart(userId, course.courseId);
+        if (res) {
+          alert("✅ Đã thêm vào giỏ hàng!");
+        }
       }
     } catch (err) {
       console.error("❌ Lỗi khi thêm vào giỏ hàng:", err);
       alert("❌ Không thể thêm vào giỏ hàng");
     }
   };
+
   return (
     <>
       <div className="page-title-area">

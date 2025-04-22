@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import OrderService from "../../../services/OrderService";
+import UserService from "../../../services/UserService";
+import CartService from "../../../services/CartService";
 import { urlImage } from "../../../config";
 
 const Checkout = () => {
@@ -8,13 +10,34 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems = [], subtotal = 0 } = location.state || {};
 
-  const [deliveryName, setDeliveryName] = useState("");
-  const [deliveryEmail, setDeliveryEmail] = useState("");
-  const [deliveryPhone, setDeliveryPhone] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [Name, setName] = useState("");
+  const [Email, setEmail] = useState("");
+  const [Phone, setPhone] = useState("");
+  const [Address, setAddress] = useState("");
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const sessionToken = localStorage.getItem("sessionToken");
+      if (!sessionToken) {
+        alert("Bạn cần Đăng Nhập Để Thanh Toán");
+        navigate("/");
+        return;
+      }
+      try {
+        const response = await UserService.checkAuth();
+        if (response) {
+          setUserId(response.userId);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user auth:", error);
+      }
+    };
+    fetchUserId();
+  }, []);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,46 +53,56 @@ const Checkout = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (!deliveryName || !deliveryEmail || !deliveryPhone || !deliveryAddress) {
+    if (!Name || !Email || !Phone || !Address) {
       setError("Please fill in all the required fields.");
       setLoading(false);
       return;
     }
 
-    if (!validateEmail(deliveryEmail)) {
+    if (!validateEmail(Email)) {
       setError("Please enter a valid email address.");
       setLoading(false);
       return;
     }
 
-    if (!validatePhone(deliveryPhone)) {
+    if (!validatePhone(Phone)) {
       setError("Please enter a valid phone number.");
       setLoading(false);
       return;
     }
 
     const order = {
-      delivery_name: deliveryName,
-      delivery_email: deliveryEmail,
-      delivery_phone: deliveryPhone,
-      delivery_address: deliveryAddress,
-      note,
-      total: subtotal,
-      status: 2,
-      order_status: 1,
-      items: cartItems,
+      Name,
+      Email,
+      Phone,
+      Address,
+      Note: note,
+      Total: subtotal,
+      StatusOrderId: 2,
+      UserId: Number(userId),
+      Items: cartItems.map((item) => ({
+        courseID: item.courseID,
+        Quantity: item.quantity,
+        Price: item.price,
+      })),
     };
 
     try {
       const result = await OrderService.store(order);
-      console.log("API Response:", result);
 
-      if (result.status) {
-        const newOrder = { ...order, id: result.order.id };
-        updateLocalStorage(newOrder);
-        navigate("/home/thanks", { state: { order: newOrder } });
+      if (result && result.orderId) {
+        const newOrder = { ...order, id: result.orderId };
+
+        // Update localStorage
+        await CartService.clear(userId);
+
+        // Navigate with new state (without cartItems)
+        navigate("/home/thanks", {
+          state: { order: newOrder },
+          replace: true, // Prevent going back to checkout
+        });
       } else {
-        setError(result.message || "Failed to save order. Please try again.");
+        setError(result?.message || "Failed to save order. Please try again.");
       }
     } catch (error) {
       console.error("Error while saving order:", error);
@@ -83,25 +116,14 @@ const Checkout = () => {
     const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
     existingOrders.push(newOrder);
     localStorage.setItem("orders", JSON.stringify(existingOrders));
-    console.log("Saved Orders:", existingOrders);
   };
-
-  if (cartItems.length === 0) {
-    return (
-      <div className="no-item">
-        No items in your cart. Please go back to shopping.
-        <div className="no col-md-6">
-          <Link to="/home/product-all" className="btn btn-outline-black ms-2">
-            Continue Shopping
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
-      <section className="py-5">
+      <div className="page-title-area pb-0 pt-6">
+        <h1 className="font-bold text-danger">Thanh Toán</h1>
+      </div>
+      <section className="py-5 ">
         <div className="container">
           <div className="row">
             <h1 className="text-main">Delivery Information</h1>
@@ -111,10 +133,10 @@ const Checkout = () => {
                   <label htmlFor="name">Name</label>
                   <input
                     type="text"
-                    name="deliveryName"
+                    name="Name"
                     className="form-control"
-                    value={deliveryName}
-                    onChange={(e) => setDeliveryName(e.target.value)}
+                    value={Name}
+                    onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
@@ -122,10 +144,10 @@ const Checkout = () => {
                   <label htmlFor="phone">Phone</label>
                   <input
                     type="text"
-                    name="deliveryPhone"
+                    name="Phone"
                     className="form-control"
-                    value={deliveryPhone}
-                    onChange={(e) => setDeliveryPhone(e.target.value)}
+                    value={Phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     required
                   />
                 </div>
@@ -133,10 +155,10 @@ const Checkout = () => {
                   <label htmlFor="email">Email</label>
                   <input
                     type="email"
-                    name="email"
+                    name="Email"
                     className="form-control"
-                    value={deliveryEmail}
-                    onChange={(e) => setDeliveryEmail(e.target.value)}
+                    value={Email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -144,10 +166,10 @@ const Checkout = () => {
                   <label htmlFor="address">Address</label>
                   <input
                     type="text"
-                    name="address"
+                    name="Address"
                     className="form-control"
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    value={Address}
+                    onChange={(e) => setAddress(e.target.value)}
                     required
                   />
                 </div>
@@ -178,7 +200,7 @@ const Checkout = () => {
                 <thead>
                   <tr className="bg-light">
                     <th>Image</th>
-                    <th>Product Name</th>
+                    <th>Course Title</th>
                     <th className="text-center">Quantity</th>
                     <th className="text-center">Price</th>
                     <th className="text-center">Total</th>
@@ -190,17 +212,20 @@ const Checkout = () => {
                       <td>
                         <img
                           className="img-fluid"
-                          src={`${urlImage}products/${item.image}`}
+                          style={{ width: "100px" }}
+                          src={`${urlImage}${item.image}`}
                           alt={item.name}
                         />
                       </td>
-                      <td className="align-middle">{item.name}</td>
-                      <td className="text-center align-middle">{item.qty}</td>
+                      <td className="align-middle">{item.courseTitle}</td>
+                      <td className="text-center align-middle">
+                        {item.quantity}
+                      </td>
                       <td className="text-center align-middle">
                         {item.price.toFixed(2)}
                       </td>
                       <td className="text-center align-middle">
-                        {(item.price * item.qty).toFixed(2)}
+                        {(item.price * item.quantity).toFixed(2)}
                       </td>
                     </tr>
                   ))}

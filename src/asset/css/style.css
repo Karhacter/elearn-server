@@ -1303,15 +1303,15 @@ Slider 2 Area Css
 }
 
 .slider-area-2 .single-slider-bg-1 {
-  background: url(../images/home-bg-3.jpg);
+  background: url("../images/home-bg-3.jpg");
 }
 
 .slider-area-2 .single-slider-bg-2 {
-  background: url(../images/home-bg-4.jpg);
+  background: url("../images/home-bg-4.jpg");
 }
 
 .slider-area-2 .single-slider-bg-3 {
-  background: url(../images/home-bg-5.jpg);
+  background: url("../images/home-bg-5.jpg");
 }
 
 /*

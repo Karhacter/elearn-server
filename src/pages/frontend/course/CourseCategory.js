@@ -18,7 +18,7 @@ const CourseCategory = () => {
         setLoading(false);
       }
     })();
-  }, [loading]);
+  }, [id]);
   return (
     <>
       <div className="page-title-area">

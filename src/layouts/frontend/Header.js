@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CategoryService from "../../services/CategoryService";
 
 const Header = () => {
   const [categorys, setCategorys] = useState([]);
-
+  const nagivate = useNavigate();
   useEffect(() => {
     (async () => {
       const res = await CategoryService.get_list();
@@ -110,7 +110,6 @@ const Header = () => {
                             <Link
                               to={"/home/course/category/" + category.id}
                               className="nav-link"
-                              key={category.id}
                             >
                               {category.name}
                             </Link>

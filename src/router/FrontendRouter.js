@@ -8,10 +8,12 @@ import Thankyou from "../pages/frontend/cart/Thanks";
 import Course from "../pages/frontend/course/Course";
 import CourseCategory from "../pages/frontend/course/CourseCategory";
 import CourseDetail from "../pages/frontend/course/CourseDetail";
+import Home from "../pages/frontend/home";
 
 const FrontendRouter = [
-  // product
-  
+  // Homepage
+  { path: "/home", element: <Home /> },
+
   // route contact
   { path: "/home/contact", element: <Contact /> },
   { path: "/home/course", element: <Course /> },

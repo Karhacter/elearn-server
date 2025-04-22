@@ -90,6 +90,11 @@ const Header = () => {
                   </li>
                 </ul>
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0 d-flex">
+                <li className="nav-item">
+                    <Link className="nav-link" to="/home">
+                      Client
+                    </Link>
+                  </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={HandleLogout} to="#">
                       Logout
