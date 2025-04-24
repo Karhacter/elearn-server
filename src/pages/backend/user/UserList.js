@@ -20,10 +20,9 @@ const UserList = () => {
 
   const handleDelete = async (id) => {
     const result = await UserService.remove(id);
-    if (result) {
-      alert("Xóa Tài Khoản Thành Công");
-      setInsertId(result.users.insertId);
-    }
+
+    alert("Xóa Tài Khoản Thành Công");
+    setInsertId(result.insertId);
   };
   return (
     <div className="card">
@@ -68,14 +67,14 @@ const UserList = () => {
                       <div className="function_style">
                         <Link
                           className="px-1 me-1 text-primary"
-                          to={"/admin/user/edit/" + user.id}
+                          to={"/admin/user/edit/" + user.userId}
                         >
                           <i className="btn btn btn-primary fa fa-edit"></i>
                         </Link>
                         <Link className="px-1 me-1 text-danger">
                           <i
                             className="btn btn btn-danger fa fa-trash"
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.userId)}
                           ></i>
                         </Link>
                       </div>

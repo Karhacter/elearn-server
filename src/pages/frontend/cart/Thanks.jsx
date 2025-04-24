@@ -19,7 +19,7 @@ const ThankYouPage = () => {
               Continue Shopping
             </Link>
             <Link
-              to="/order-tracking"
+              to="/home/order-tracking"
               className="btn btn-outline-secondary btn-lg"
             >
               Track Your Order

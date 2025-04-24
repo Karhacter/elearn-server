@@ -5,7 +5,7 @@ const UserService = {
     return httpAxios.get("user");
   },
   store: async (user) => {
-    return await httpAxios.post("user/store", user);
+    return await httpAxios.post("user/add", user);
   },
   remove: async (id) => {
     return await httpAxios.delete(`user/${id}`);
@@ -24,6 +24,13 @@ const UserService = {
   },
   logout: async () => {
     return await httpAxios.post("auth/logout");
+  },
+  uploadImage: async (userId, formData) => {
+    return await httpAxios.post(`user/${userId}/upload-image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
 };
 

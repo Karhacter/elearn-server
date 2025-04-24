@@ -9,6 +9,7 @@ import Course from "../pages/frontend/course/Course";
 import CourseCategory from "../pages/frontend/course/CourseCategory";
 import CourseDetail from "../pages/frontend/course/CourseDetail";
 import Home from "../pages/frontend/home";
+import Order from "../pages/frontend/cart/Order";
 
 const FrontendRouter = [
   // Homepage
@@ -21,6 +22,7 @@ const FrontendRouter = [
   { path: "/home/course/category/:id", element: <CourseCategory /> },
   // route blog
 
+  { path: "/home/order-tracking", element: <Order /> },
   // accout
   { path: "/home/cart", element: <Cart /> },
   { path: "/home/checkout", element: <Checkout /> },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserService from "../../../services/UserService";
+import { urlImage } from "../../../config";
 
 const UserDetail = () => {
   const [user, setUser] = useState({});
@@ -65,7 +66,11 @@ const UserDetail = () => {
             <tr>
               <td>Ảnh đại diện</td>
               <td>
-                <img src={user.profilePicture} alt="Profile" width="120" />
+                <img
+                  src={urlImage + user.profilePicture}
+                  alt="Profile"
+                  width="120"
+                />
               </td>
             </tr>
           </tbody>

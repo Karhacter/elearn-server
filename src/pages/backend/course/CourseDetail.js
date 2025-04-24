@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CourseService from "../../../services/CourseService";
+import { urlImage } from "../../../config";
 
 const CourseDetail = () => {
   const [course, setCourse] = useState({});
@@ -82,7 +83,7 @@ const CourseDetail = () => {
             <tr>
               <td>Ảnh đại diện (Image)</td>
               <td>
-                <img src={course.image} alt="Course" width="150" />
+                <img src={urlImage + course.image} alt="Course" width="150" />
               </td>
             </tr>
             <tr>

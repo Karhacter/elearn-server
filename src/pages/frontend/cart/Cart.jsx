@@ -97,7 +97,7 @@ const Cart = () => {
       <div className="page-title-area pb-0 pt-6">
         <h1 className="font-bold text-danger">Giỏ Hàng Của Bạn</h1>
       </div>
-      <div className="container my-5   ">
+      <div className="container my-5">
         <div className="table-responsive">
           <table className="table table-bordered table-hover text-center">
             <thead className="table-dark">
@@ -105,8 +105,6 @@ const Cart = () => {
                 <th>Image</th>
                 <th>courseTitle</th>
                 <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -125,32 +123,8 @@ const Cart = () => {
                       </td>
                       <td>{item.courseTitle}</td>
                       <td>${item.price.toFixed(2)}</td>
-                      <td>
-                        <div className="input-group justify-content-center">
-                          <button
-                            className="btn btn-outline-secondary"
-                            onClick={() => handleQuantityChange(item, -1)}
-                            disabled={loadingItem === item.courseID}
-                          >
-                            -
-                          </button>
-                          <input
-                            type="text"
-                            value={item.quantity}
-                            readOnly
-                            className="form-control text-center mx-1"
-                            style={{ maxWidth: "50px" }}
-                          />
-                          <button
-                            className="btn btn-outline-secondary"
-                            onClick={() => handleQuantityChange(item, 1)}
-                            disabled={loadingItem === item.courseID}
-                          >
-                            +
-                          </button>
-                        </div>
-                      </td>
-                      <td>${(item.price * item.quantity).toFixed(2)}</td>
+
+                      <td></td>
                       <td>
                         <button
                           className="btn btn-danger btn-sm"

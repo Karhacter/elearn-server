@@ -12,6 +12,7 @@ const OrderList = () => {
 
       if (result) {
         setOrders(result);
+        console.log(result);
       }
     })();
   }, [insertId]);
@@ -93,7 +94,9 @@ const OrderList = () => {
                     </td>
                     <td>
                       <div className="name">
-                        <Link href="#">{order.name}</Link>
+                        <Link to={"/admin/orderdetail/" + order.orderID}>
+                          {order.name}
+                        </Link>
                       </div>
                     </td>
                     <td>{order.phone}</td>
@@ -102,7 +105,7 @@ const OrderList = () => {
                     <td>
                       <Link
                         className="px-1 me-1 text-primary"
-                        to={"/admin/order/edit/" + order.id}
+                        to={"/admin/order/edit/" + order.orderID}
                       >
                         <i className="btn btn btn-primary fa fa-edit"></i>
                       </Link>

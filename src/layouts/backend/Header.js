@@ -77,11 +77,11 @@ const Header = () => {
                     </Link>
                   </li>
 
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <Link className="nav-link text-white" to="/admin/order">
                       Chi Tiết Đơn Hàng
                     </Link>
-                  </li>
+                  </li> */}
 
                   <li className="nav-item">
                     <Link className="nav-link text-white" to="/admin/user">
@@ -90,7 +90,7 @@ const Header = () => {
                   </li>
                 </ul>
                 <ul className="navbar-nav ms-auto mb-2 mb-lg-0 d-flex">
-                <li className="nav-item">
+                  <li className="nav-item">
                     <Link className="nav-link" to="/home">
                       Client
                     </Link>

@@ -21,6 +21,8 @@ import {
 import OrderList from "../pages/backend/order/OrderList";
 
 import Dashboard from "../pages/backend/Dashboard";
+import OrderEdit from "../pages/backend/order/OrderEdit";
+import OrderDetail from "../pages/backend/order/OrderDetail";
 
 const BackendRouter = [
   { path: "/admin", element: <Dashboard /> },
@@ -44,6 +46,8 @@ const BackendRouter = [
 
   // Order
   { path: "/admin/order", element: <OrderList /> },
+  { path: "/admin/order/edit/:id", element: <OrderEdit /> },
+  { path: "/admin/orderdetail/:id", element: <OrderDetail /> },
 ];
 
 export default BackendRouter;

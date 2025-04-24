@@ -5,49 +5,67 @@ import UserService from "../../../services/UserService";
 const UserCreate = () => {
   const [insertId, setInsertId] = useState(0);
 
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRepassword] = useState("");
   const [email, setEmail] = useState("");
-  const [reemail, setReemail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [name, setName] = useState("");
-  const [roles, setRoles] = useState("admin");
-  const [gender, setGender] = useState(1);
-  const [address, setAddress] = useState("");
-  const [status, setStatus] = useState(1);
+  const [PhoneNumber, setPhone] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState("Admin");
+  const [imageFile, setImageFile] = useState(null);
 
-  const handleSubmit = (event) => {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (password != repassword) {
+      newErrors.title = "Mật Khẩu không trùng khớp";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // alert("Đã thêm sản phẩm");
-    const image = document.querySelector("#image");
 
-    const user = new FormData();
-    user.append("username", username);
-    user.append("password", password);
-    user.append("repassword", repassword);
-    user.append("email", email);
-    user.append("phone", phone);
-    user.append("name", name);
-    user.append("gender", gender);
-    user.append("roles", roles);
-    user.append("address", address);
-    user.append("status", status);
-    user.append("image", image.files.length === 0 ? "" : image.files[0]);
+    try {
+      const userData = {
+        fullName,
+        email,
+        password,
+        PhoneNumber,
+        role,
+      };
 
-    if (repassword != password) {
-      alert("Mật khẩu xác nhận không đúng");
-      return;
-    } else {
-      (async () => {
-        const result = await UserService.store(user);
-        if (result.status === true) {
-          alert(result.message);
-          setInsertId(result.user.insertId);
-          console.log(result);
-          window.location.href = "/admin/user";
-        }
-      })();
+      if (!validate()) {
+        return;
+      }
+
+      const createRes = await UserService.store(userData);
+      const createdUser = createRes;
+
+      if (imageFile) {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("imageFile", imageFile);
+        await UserService.uploadImage(createdUser.userId, formData);
+        setUploading(false);
+      }
+      alert("Thêm Thành Viên Mới Thành Công");
+      window.location.href = "/admin/user";
+    } catch (error) {
+      setUploading(false);
+      setMessage(
+        "Error creating course: " + (error.response?.data || error.message)
+      );
     }
   };
   return (
@@ -73,14 +91,14 @@ const UserCreate = () => {
             <div className="col-md-6">
               <div className="mb-3">
                 <label>
-                  <strong>Tên đăng nhập(*)</strong>
+                  <strong>Email(*)</strong>
                 </label>
                 <input
                   type="text"
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="form-control"
-                  placeholder="Tên đăng nhập"
+                  placeholder="Email"
                 />
               </div>
               <div className="mb-3">
@@ -107,37 +125,14 @@ const UserCreate = () => {
                   placeholder="Xác nhận mật khẩu"
                 />
               </div>
-              <div className="mb-3">
-                <label>
-                  <strong>Email(*)</strong>
-                </label>
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="form-control"
-                  placeholder="Email"
-                />
-              </div>
-              <div className="mb-3">
-                <label>
-                  <strong>Xác nhận Email(*)</strong>
-                </label>
-                <input
-                  type="text"
-                  value={reemail}
-                  onChange={(e) => setReemail(e.target.value)}
-                  className="form-control"
-                  placeholder="Email"
-                />
-              </div>
+
               <div className="mb-3">
                 <label>
                   <strong>Điện thoại(*)</strong>
                 </label>
                 <input
                   type="text"
-                  value={phone}
+                  value={PhoneNumber}
                   onChange={(e) => setPhone(e.target.value)}
                   className="form-control"
                   placeholder="Điện thoại"
@@ -151,58 +146,34 @@ const UserCreate = () => {
                 </label>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   className="form-control"
                   placeholder="Họ tên"
                 />
               </div>
-              <div className="mb-3">
-                <label>
-                  <strong>Giới tính</strong>
-                </label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  name="gender"
-                  id="gender"
-                  className="form-select"
-                >
-                  <option>Chọn giới tinh</option>
-                  <option value="1">Nam</option>
-                  <option value="0">Nữ</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label>
-                  <strong>Địa chỉ</strong>
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="form-control"
-                  placeholder="Địa chỉ"
-                />
-              </div>
+
               <div className="mb-3">
                 <label>
                   <strong>Hình đại diện</strong>
                 </label>
-                <input type="file" id="image" className="form-control" />
-              </div>
-              <div className="mb-3">
-                <label>
-                  <strong>Trạng thái</strong>
-                </label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="form-select"
-                >
-                  <option value="1">Xuất bản</option>
-                  <option value="2">Chưa xuất bản</option>
-                </select>
+                <input
+                  type="file"
+                  id="image"
+                  className="form-control"
+                  onChange={handleImageChange}
+                />
+                {imageFile && (
+                  <img
+                    src={URL.createObjectURL(imageFile)}
+                    alt="Preview"
+                    style={{
+                      marginTop: "10px",
+                      maxWidth: "100%",
+                      maxHeight: "200px",
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>
