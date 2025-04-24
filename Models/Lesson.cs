@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace elearn_server.Models;
 
-public class Lesson
+public class Lesson : BaseEntity
 {
     [Key]
     public int LessonId { get; set; }

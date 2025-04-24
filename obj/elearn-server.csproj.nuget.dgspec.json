@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\elearn-server\\elearn-server.csproj": {}
+    "C:\\Projects\\elearn-server\\elearn-server.csproj": {}
   },
   "projects": {
-    "D:\\elearn-server\\elearn-server.csproj": {
+    "C:\\Projects\\elearn-server\\elearn-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\elearn-server\\elearn-server.csproj",
+        "projectUniqueName": "C:\\Projects\\elearn-server\\elearn-server.csproj",
         "projectName": "elearn-server",
-        "projectPath": "D:\\elearn-server\\elearn-server.csproj",
-        "packagesPath": "C:\\Users\\84368\\.nuget\\packages\\",
-        "outputPath": "D:\\elearn-server\\obj\\",
+        "projectPath": "C:\\Projects\\elearn-server\\elearn-server.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Projects\\elearn-server\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\84368\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -44,6 +44,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[7.0.11, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.2, )"
@@ -96,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

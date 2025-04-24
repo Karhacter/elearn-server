@@ -23,18 +23,20 @@ public class AppDbContext : DbContext
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Wishlist> Wishlists { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetail> orderDetails { get; set; }
+    public DbSet<StatusOrder> StatusOrders { get; set; }
+    public DbSet<Cart> Carts { get; set; }
+
+    public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<elearn_server.Models.BlacklistedToken> BlacklistedTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply NoAction to all entities that reference User
-        // modelBuilder.Model.GetEntityTypes()
-        //     .SelectMany(e => e.GetForeignKeys())
-        //     .Where(fk => fk.PrincipalEntityType.ClrType == typeof(User))
-        //     .ToList()
-        //     .ForEach(fk => fk.DeleteBehavior = DeleteBehavior.NoAction);
-
+        modelBuilder.Entity<Course>().Property(c => c.Price).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<OrderDetail>().Property(od => od.Price).HasColumnType("decimal(18,2)");
 
         var sensitiveEntities = new[] { typeof(User), typeof(Course) };
 

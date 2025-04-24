@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace elearn_server.Models;
 
-public class User
+public class User : BaseEntity
 {
     [Key]
     public int UserId { get; set; }
@@ -27,16 +27,16 @@ public class User
     [RegularExpression("^(Admin|Instructor|Student)$", ErrorMessage = "Role must be Admin, Instructor, or Student")]
     public string Role { get; set; }
 
-    [Url(ErrorMessage = "Invalid URL format for profile picture")]
-    public string ProfilePicture { get; set; }
+    [MaxLength(100, ErrorMessage = "Invalid URL format for profile picture")]
+    public string? ProfilePicture { get; set; }
 
     // Relationships and Constraints
-    public ICollection<Enrollment> Enrollments { get; set; }      // User's course enrollments
-    public ICollection<Payment> Payments { get; set; }            // User's payment history
-    public ICollection<Wishlist> Wishlists { get; set; }          // Courses the user has added to wishlist
-    public ICollection<Certificate> Certificates { get; set; }
-    public ICollection<Comment> Comments { get; set; }
-    public ICollection<Rating> Ratings { get; set; }
-    public ICollection<Notification> Notifications { get; set; }
+    public ICollection<Enrollment>? Enrollments { get; set; }      // User's course enrollments
+    public ICollection<Payment>? Payments { get; set; }            // User's payment history
+    public ICollection<Wishlist>? Wishlists { get; set; }          // Courses the user has added to wishlist
+    public ICollection<Certificate>? Certificates { get; set; }
+    public ICollection<Comment>? Comments { get; set; }
+    public ICollection<Rating>? Ratings { get; set; }
+    public ICollection<Notification>? Notifications { get; set; }
 
 }
