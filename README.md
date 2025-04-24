@@ -10,32 +10,6 @@ This leverages .NET 6, new hosting model, and new routing API to enhance .NET pe
 |----------------|------------ |---------------------|
 | main | 6.0.100-preview.6.21355.2 | 2.2.0 |
 
-## Project Structure
-```
-├── Controllers
-│   └── KubeOpsController.cs
-├── Dockerfile
-├── KubernetesLocalProcessConfig.yaml
-├── LICENSE
-├── Models
-│   └── DatabaseConfig.cs
-├── Program.cs
-├── Properties
-│   └── launchSettings.json
-├── README.md
-├── Services
-│   └── APIService.cs
-├── Startup.cs
-├── appsettings.Development.json
-├── bin
-│   └── Debug
-├── configs
-│   └── prod
-├── dotnet-core-web-api.csproj
-├── dotnet-core-web-api.sln
-├── manifests
-│   ├── deployment.yaml
-│   └── service.yaml
 ```
 
 - `Dockerfile` is .NET Core Web API Multistage Dockerfile (following Docker Best Practices)
