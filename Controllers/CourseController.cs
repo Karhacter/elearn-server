@@ -193,4 +193,35 @@ public class CourseController : ControllerBase
 
         return Ok(new { ImageUrl = course.Image });
     }
+
+    
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchCourses([FromQuery] string? keyword, [FromQuery] int? genreId, [FromQuery] int? instructorId)
+    {
+        var query = _context.Courses.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query = query.Where(c =>
+                c.Title!.Contains(keyword) ||
+                c.Description!.Contains(keyword));
+        }
+
+        if (genreId.HasValue)
+        {
+            query = query.Where(c => c.GenreId == genreId.Value);
+        }
+
+        if (instructorId.HasValue)
+        {
+            query = query.Where(c => c.InstructorId == instructorId.Value);
+        }
+
+        var result = await query
+            .Include(c => c.Genre)
+            .Include(c => c.Instructor)
+            .ToListAsync();
+
+        return Ok(result);
+    }
 }
