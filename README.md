@@ -1,3 +1,23 @@
+# E-Learn Server
+
+## Project Docs
+
+- Change history: `docs/CHANGELOG.md`
+- Ongoing implementation notes: `docs/WORKLOG.md`
+
+## Change Tracking Workflow
+
+- Record user-visible backend changes in `docs/CHANGELOG.md`.
+- Record implementation context and verification notes in `docs/WORKLOG.md`.
+- For larger features, prefer updating both files in the same commit.
+
+## Ollama Setup
+
+- Install Ollama on your machine.
+- Start Ollama so `http://localhost:11434` is available.
+- Pull the model configured in `appsettings.json`, for example `ollama pull llama3.2:3b`.
+- The recommendation API will use Ollama locally and fall back to heuristic ranking if Ollama is unavailable.
+
 [![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy?repository=https://github.com/kubeopsskills/dotnet-core-web-api&branch=develop)
 
 # .NET Core Web API Starter Project
@@ -6,10 +26,41 @@ This is a boilerplate template for building / deploying a .NET Core Web API micr
 This leverages .NET 6, new hosting model, and new routing API to enhance .NET performance. You can learn .NET 6 more on [ASP.NET Core minimal APIs](https://www.dotnetthailand.com/web-frameworks/asp-net-core/asp-net-core-minimal-apis).
 
 ## Versioning
-| GitHub Release | .NET Core Version | Diagnostics HealthChecks Version |
-|----------------|------------ |---------------------|
-| main | 6.0.100-preview.6.21355.2 | 2.2.0 |
 
+| GitHub Release | .NET Core Version         | Diagnostics HealthChecks Version |
+| -------------- | ------------------------- | -------------------------------- |
+| main           | 6.0.100-preview.6.21355.2 | 2.2.0                            |
+
+<<<<<<< HEAD
+=======
+## Project Structure
+
+```
+├── Controllers
+│   └── KubeOpsController.cs
+├── Dockerfile
+├── KubernetesLocalProcessConfig.yaml
+├── LICENSE
+├── Models
+│   └── DatabaseConfig.cs
+├── Program.cs
+├── Properties
+│   └── launchSettings.json
+├── README.md
+├── Services
+│   └── APIService.cs
+├── Startup.cs
+├── appsettings.Development.json
+├── bin
+│   └── Debug
+├── configs
+│   └── prod
+├── dotnet-core-web-api.csproj
+├── dotnet-core-web-api.sln
+├── manifests
+│   ├── deployment.yaml
+│   └── service.yaml
+>>>>>>> 05ff1ce (update function)
 ```
 
 - `Dockerfile` is .NET Core Web API Multistage Dockerfile (following Docker Best Practices)
@@ -17,8 +68,8 @@ This leverages .NET 6, new hosting model, and new routing API to enhance .NET pe
 - `configs` folder will contain .NET Core Web API centralized config structure
 - `appsettings.Development.json` is .NET Core Web API development environment config
 - `manifests` folder will contain Kubernetes manifests (deployment, service)
-- `Startup.cs` is .NET Core Web API startup & path routing config 
-- `Program.cs` is .NET Core Web API environment variable mapping config 
+- `Startup.cs` is .NET Core Web API startup & path routing config
+- `Program.cs` is .NET Core Web API environment variable mapping config
 
 ## Setting Up
 
@@ -61,7 +112,6 @@ This will deploy it on Kubernetes with the centralized config.
 
 - [ACI Context](https://docs.docker.com/cloud/aci-integration/#run-docker-containers-on-aci)
 
-
 To deploy the microservice on ACI, run following command:
 
 ```sh
@@ -94,10 +144,8 @@ $ copilot env init --name test --app kubeops-demo
 $ copilot svc deploy --env test
 ```
 
-
 ## Learning Resources:
 
 - [.NET Thailand](https://www.dotnetthailand.com/)
 - [Announcing .NET 6 Preview 4](https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-6-preview-4/)
 - [Breaking changes in .NET 6](https://docs.microsoft.com/en-us/dotnet/core/compatibility/6.0)
-

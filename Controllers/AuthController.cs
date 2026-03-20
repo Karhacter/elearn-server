@@ -6,6 +6,8 @@ using System.Text;
 using elearn_server.DTO;
 using elearn_server.Data;
 using Microsoft.AspNetCore.Identity;
+using elearn_server.Services;
+using System.Security.Cryptography;
 
 namespace elearn_server.Controllers
 {
@@ -29,6 +31,33 @@ namespace elearn_server.Controllers
             return Ok(users);
         }
 
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
+
+        public AuthController(AppDbContext context, IEmailService emailService, IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            _context = context;
+            _passwordHasher = new PasswordHasher<Models.User>();
+            _emailService = emailService;
+            _configuration = configuration;
+            _environment = environment;
+        }
+
+        // Lấy ra user, để kiểm tra xem khi đăng ký có bị trùng không.
+        [HttpGet("users/{id}")]
+        public IActionResult GetUserById(int id)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.UserId == id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(user);
+        }
+
+        // Check auth user để kiểm tra có lưu trên cookies/ session / localStorage.
         [HttpGet("check-auth")]
         public IActionResult CheckAuth()
         {
@@ -71,6 +100,8 @@ namespace elearn_server.Controllers
             }
         }
 
+
+        // Hàm Login User
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLoginDTO loginDto)
         {
@@ -106,6 +137,8 @@ namespace elearn_server.Controllers
             return Ok(new { Token = tokenHandler.WriteToken(token) });
         }
 
+
+        // api/auth/regiter
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserCreateDTO registerDto)
         {
@@ -135,7 +168,105 @@ namespace elearn_server.Controllers
             _context.Users.Add(newUser);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetUsers), new { id = newUser.UserId }, newUser);
+            return CreatedAtAction(nameof(GetUserById), new { id = newUser.UserId }, newUser);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = _context.Users.SingleOrDefault(u => u.Email == requestDto.Email);
+            if (user == null)
+            {
+                return Ok(new
+                {
+                    message = "If an account with that email exists, a password reset link has been sent."
+                });
+            }
+
+            var activeTokens = _context.PasswordResetTokens
+                .Where(t => t.UserId == user.UserId && !t.IsUsed && t.ExpiresAt > DateTime.UtcNow)
+                .ToList();
+
+            foreach (var token in activeTokens)
+            {
+                token.IsUsed = true;
+                token.UsedAt = DateTime.UtcNow;
+            }
+
+            var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            var tokenHash = HashToken(rawToken);
+            var expiresAt = DateTime.UtcNow.AddMinutes(15);
+
+            var passwordResetToken = new Models.PasswordResetToken
+            {
+                UserId = user.UserId,
+                TokenHash = tokenHash,
+                ExpiresAt = expiresAt,
+                IsUsed = false
+            };
+
+            _context.PasswordResetTokens.Add(passwordResetToken);
+            _context.SaveChanges();
+
+            var frontendBaseUrl = _configuration["App:FrontendBaseUrl"] ?? "http://localhost:3000";
+            var resetLink = $"{frontendBaseUrl.TrimEnd('/')}/reset-password?token={Uri.EscapeDataString(rawToken)}";
+
+            if (_emailService.IsConfigured())
+            {
+                await _emailService.SendPasswordResetEmailAsync(user.Email, user.FullName, resetLink);
+            }
+
+            if (_environment.IsDevelopment())
+            {
+                return Ok(new
+                {
+                    message = "Password reset request processed successfully.",
+                    resetLink
+                });
+            }
+
+            return Ok(new
+            {
+                message = "If an account with that email exists, a password reset link has been sent."
+            });
+        }
+
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var tokenHash = HashToken(requestDto.Token);
+            var resetToken = _context.PasswordResetTokens
+                .OrderByDescending(t => t.Id)
+                .SingleOrDefault(t => t.TokenHash == tokenHash);
+
+            if (resetToken == null || resetToken.IsUsed || resetToken.ExpiresAt <= DateTime.UtcNow)
+            {
+                return BadRequest(new { message = "Reset token is invalid or has expired." });
+            }
+
+            var user = _context.Users.SingleOrDefault(u => u.UserId == resetToken.UserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            user.Password = _passwordHasher.HashPassword(user, requestDto.NewPassword);
+            resetToken.IsUsed = true;
+            resetToken.UsedAt = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return Ok(new { message = "Password has been reset successfully." });
         }
 
         [HttpPost("logout")]
@@ -171,5 +302,13 @@ namespace elearn_server.Controllers
 
             return Ok(new { message = "Logged out successfully." });
         }
+
+        private static string HashToken(string rawToken)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+            return Convert.ToHexString(bytes);
+        }
     }
+
+
 }

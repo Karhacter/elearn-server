@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("elearn-server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1581fd081037a52e16c2ce0d20d46a337b187269")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80dc1aadeff15bc1daa6465ca0986ce38f37c11c")]
 [assembly: System.Reflection.AssemblyProductAttribute("elearn-server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("elearn-server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
