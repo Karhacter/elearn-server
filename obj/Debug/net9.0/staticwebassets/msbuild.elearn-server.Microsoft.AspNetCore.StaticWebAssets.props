@@ -1,5 +1,6 @@
 ﻿<Project>
   <ItemGroup>
+<<<<<<< HEAD
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\050d5d05-978c-4e1a-ab4e-667134e46460.jpg'))">
       <SourceType>Package</SourceType>
       <SourceId>elearn-server</SourceId>
@@ -18,6 +19,8 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\050d5d05-978c-4e1a-ab4e-667134e46460.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+=======
+>>>>>>> b9eee7b (wip: save today's work)
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\09486f57-12b4-41c2-8541-f4b8a0c25478.jpg'))">
       <SourceType>Package</SourceType>
       <SourceId>elearn-server</SourceId>
@@ -36,6 +39,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\09486f57-12b4-41c2-8541-f4b8a0c25478.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+<<<<<<< HEAD
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\0a3274ed-9eb4-4eb0-a3de-6dbb4c0ff679.png'))">
       <SourceType>Package</SourceType>
       <SourceId>elearn-server</SourceId>
@@ -108,6 +112,8 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\4d0cd33d-3812-41c7-9b82-8e9284a99532.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+=======
+>>>>>>> b9eee7b (wip: save today's work)
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\4d459658-5dbf-4b9d-a397-42a347aeab05.jpg'))">
       <SourceType>Package</SourceType>
       <SourceId>elearn-server</SourceId>
@@ -126,6 +132,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\4d459658-5dbf-4b9d-a397-42a347aeab05.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+<<<<<<< HEAD
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\4d5de585-c338-4424-87fb-081285e84bd7.jpg'))">
       <SourceType>Package</SourceType>
       <SourceId>elearn-server</SourceId>
@@ -342,5 +349,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\f2f91b5c-6313-4a7f-b8ac-b4e49be1f855.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+=======
+>>>>>>> b9eee7b (wip: save today's work)
   </ItemGroup>
 </Project>

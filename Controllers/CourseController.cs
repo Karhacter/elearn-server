@@ -194,7 +194,7 @@ public class CourseController : ControllerBase
         return Ok(new { ImageUrl = course.Image });
     }
 
-    
+
     [HttpGet("search")]
     public async Task<IActionResult> SearchCourses([FromQuery] string? keyword, [FromQuery] int? genreId, [FromQuery] int? instructorId)
     {

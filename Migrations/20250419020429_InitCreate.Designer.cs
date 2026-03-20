@@ -12,8 +12,13 @@ using elearn_server.Data;
 namespace elearn_server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:Migrations/20250419020429_InitCreate.Designer.cs
     [Migration("20250419020429_InitCreate")]
     partial class InitCreate
+========
+    [Migration("20260317135950_InitialCreate")]
+    partial class InitialCreate
+>>>>>>>> b9eee7b (wip: save today's work):Migrations/20260317135950_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,6 +60,29 @@ namespace elearn_server.Migrations
                     b.ToTable("Assignments");
                 });
 
+<<<<<<<< HEAD:Migrations/20250419020429_InitCreate.Designer.cs
+========
+            modelBuilder.Entity("elearn_server.Models.BlacklistedToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlacklistedTokens");
+                });
+
+>>>>>>>> b9eee7b (wip: save today's work):Migrations/20260317135950_InitialCreate.Designer.cs
             modelBuilder.Entity("elearn_server.Models.Cart", b =>
                 {
                     b.Property<int>("CartId")
@@ -159,8 +187,8 @@ namespace elearn_server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(10000)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

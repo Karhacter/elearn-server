@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "Version": 1,
   "Hash": "lHBiVJdg6GFk+3yscMGGcG5HTOQ5wTQp+3JMQ6w+u1k=",
@@ -1977,3 +1978,6 @@
     }
   ]
 }
+=======
+{"Version":1,"Hash":"fTBM/4yvhf+bPVXKVJ35gBCFtMs5CBY+DMBZzq5rKGc=","Source":"elearn-server","BasePath":"/","Mode":"Root","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[{"Name":"elearn-server\\wwwroot","Source":"elearn-server","ContentRoot":"D:\\Dev\\Dự Án ELearn\\elearn-server\\wwwroot\\","BasePath":"/","Pattern":"**"}],"Assets":[],"Endpoints":[]}
+>>>>>>> b9eee7b (wip: save today's work)

@@ -3,10 +3,6 @@ using elearn_server.Data;
 using elearn_server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using elearn_server.Request;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using elearn_server.DTO;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -28,6 +24,7 @@ public class OrderController : ControllerBase
 
     // GET: api/category/{id}
     [HttpGet("detail/{id}")]
+    [HttpGet("{id}")]
     public IActionResult GetOrderById(int id)
     {
         var order = _context.Orders.Find(id);

@@ -1,6 +1,7 @@
 {
   "Files": [
     {
+<<<<<<< HEAD
       "Id": "C:\\projects\\elearn-server\\wwwroot\\uploads\\050d5d05-978c-4e1a-ab4e-667134e46460.jpg",
       "PackagePath": "staticwebassets\\uploads\\050d5d05-978c-4e1a-ab4e-667134e46460.jpg"
     },
@@ -77,6 +78,16 @@
       "PackagePath": "staticwebassets\\uploads\\f2f91b5c-6313-4a7f-b8ac-b4e49be1f855.jpg"
     },
     {
+=======
+      "Id": "D:\\elearn-server\\wwwroot\\uploads\\09486f57-12b4-41c2-8541-f4b8a0c25478.jpg",
+      "PackagePath": "staticwebassets\\uploads\\09486f57-12b4-41c2-8541-f4b8a0c25478.jpg"
+    },
+    {
+      "Id": "D:\\elearn-server\\wwwroot\\uploads\\4d459658-5dbf-4b9d-a397-42a347aeab05.jpg",
+      "PackagePath": "staticwebassets\\uploads\\4d459658-5dbf-4b9d-a397-42a347aeab05.jpg"
+    },
+    {
+>>>>>>> b9eee7b (wip: save today's work)
       "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.elearn-server.props",
       "PackagePath": "build\\elearn-server.props"
     },

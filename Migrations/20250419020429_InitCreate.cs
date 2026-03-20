@@ -6,11 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace elearn_server.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Migrations/20250419020429_InitCreate.cs
     public partial class InitCreate : Migration
+========
+    public partial class InitialCreate : Migration
+>>>>>>>> b9eee7b (wip: save today's work):Migrations/20260317135950_InitialCreate.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "BlacklistedTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlacklistedTokens", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
@@ -18,7 +36,11 @@ namespace elearn_server.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+<<<<<<<< HEAD:Migrations/20250419020429_InitCreate.cs
                     Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+========
+                    Description = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: true),
+>>>>>>>> b9eee7b (wip: save today's work):Migrations/20260317135950_InitialCreate.cs
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -655,6 +677,12 @@ namespace elearn_server.Migrations
                 name: "Assignments");
 
             migrationBuilder.DropTable(
+<<<<<<<< HEAD:Migrations/20250419020429_InitCreate.cs
+========
+                name: "BlacklistedTokens");
+
+            migrationBuilder.DropTable(
+>>>>>>>> b9eee7b (wip: save today's work):Migrations/20260317135950_InitialCreate.cs
                 name: "CartItems");
 
             migrationBuilder.DropTable(

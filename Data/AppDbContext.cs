@@ -138,6 +138,12 @@ public class AppDbContext : DbContext
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.UserId);
 
+        // User - PasswordResetToken (One-to-Many)
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasOne(prt => prt.User)
+            .WithMany()
+            .HasForeignKey(prt => prt.UserId);
+
         // Wishlist - Course (One-to-Many)
         modelBuilder.Entity<Wishlist>()
             .HasOne(w => w.Course)

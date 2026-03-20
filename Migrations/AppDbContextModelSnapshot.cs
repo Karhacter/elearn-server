@@ -555,6 +555,8 @@ namespace elearn_server.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
+                    b.Property<float>("Amount")
+                        .HasColumnType("real");
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
@@ -576,6 +578,8 @@ namespace elearn_server.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -593,6 +597,38 @@ namespace elearn_server.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("orderDetails");
+                });
+
+            modelBuilder.Entity("elearn_server.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("elearn_server.Models.Payment", b =>
@@ -1008,6 +1044,7 @@ namespace elearn_server.Migrations
 
                     b.HasOne("elearn_server.Models.Order", "Order")
                         .WithMany("OrderDetails")
+                        .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1015,6 +1052,17 @@ namespace elearn_server.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("elearn_server.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("elearn_server.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("elearn_server.Models.Payment", b =>

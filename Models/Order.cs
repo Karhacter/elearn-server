@@ -31,7 +31,10 @@ public class Order : BaseEntity
 
     [ForeignKey("StatusOrderId")]
     public StatusOrder StatusOrder { get; set; }
+<<<<<<< HEAD
 
     // Mối quan hệ với OrderDetail
     public ICollection<OrderDetail> OrderDetails { get; set; }
+=======
+>>>>>>> b9eee7b (wip: save today's work)
 }
