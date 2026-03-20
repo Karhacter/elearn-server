@@ -1,151 +1,305 @@
 # E-Learn Server
 
-## Project Docs
+> **Backend REST API for a full-featured e-learning platform**, built with ASP.NET Core Web API (.NET 9), Entity Framework Core, SQL Server, and JWT authentication.
 
-- Change history: `docs/CHANGELOG.md`
-- Ongoing implementation notes: `docs/WORKLOG.md`
+---
 
-## Change Tracking Workflow
+## Table of Contents
 
-- Record user-visible backend changes in `docs/CHANGELOG.md`.
-- Record implementation context and verification notes in `docs/WORKLOG.md`.
-- For larger features, prefer updating both files in the same commit.
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture & Project Structure](#architecture--project-structure)
+- [API Reference](#api-reference)
+- [Data Model](#data-model)
+- [Getting Started](#getting-started)
+- [Configuration Reference](#configuration-reference)
+- [AI Recommendation Engine](#ai-recommendation-engine)
+- [Development Notes](#development-notes)
+- [Roadmap](#roadmap)
+- [Documentation](#documentation)
+- [License](#license)
 
-## Ollama Setup
+---
 
-- Install Ollama on your machine.
-- Start Ollama so `http://localhost:11434` is available.
-- Pull the model configured in `appsettings.json`, for example `ollama pull llama3.2:3b`.
-- The recommendation API will use Ollama locally and fall back to heuristic ranking if Ollama is unavailable.
+## Overview
 
-[![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy?repository=https://github.com/kubeopsskills/dotnet-core-web-api&branch=develop)
+**E-Learn Server** is the server-side foundation of an online learning platform. It exposes a RESTful HTTP API consumed by a frontend client (Angular / Next.js). The API handles the full lifecycle of an e-learning product — from user registration and course browsing, to cart management, order placement, certificate issuance, and AI-assisted personalized course recommendations.
 
-# .NET Core Web API Starter Project
+---
 
-This is a boilerplate template for building / deploying a .NET Core Web API microservice on Kubernetes / Azure Container Instance.
-This leverages .NET 6, new hosting model, and new routing API to enhance .NET performance. You can learn .NET 6 more on [ASP.NET Core minimal APIs](https://www.dotnetthailand.com/web-frameworks/asp-net-core/asp-net-core-minimal-apis).
+## Features
 
-## Versioning
+### 🔐 Authentication & Security
+- JWT Bearer token authentication with configurable expiry
+- Token blacklist support for secure logout
+- Password hashing and salted storage
+- Email-based forgot-password / reset-password flow
 
-| GitHub Release | .NET Core Version         | Diagnostics HealthChecks Version |
-| -------------- | ------------------------- | -------------------------------- |
-| main           | 6.0.100-preview.6.21355.2 | 2.2.0                            |
+### 📚 Learning Domain
+- Full CRUD for Courses with pagination, search, category filtering, and image uploads
+- Category, Lesson, Enrollment, Rating, Comment, Certificate, Quiz, Assignment, and Notification APIs
+- Wishlist management for bookmarking courses
 
-<<<<<<< HEAD
-=======
-## Project Structure
+### 🛒 Commerce Flow
+- Shopping cart and cart item management
+- Order creation, tracking, and order detail management
+- Payment confirmation endpoint
+
+### 🤖 AI-Powered Recommendations
+- Roadmap-based course recommendation via a local [Ollama](https://ollama.com) model (`llama3.2:3b`)
+- Automatic fallback to internal heuristic scoring when AI is unavailable
+- Single endpoint: `POST /api/Recommendation/roadmap-courses`
+
+### ⚙️ Infrastructure
+- SQL Server persistence with EF Core code-first migrations
+- OpenAPI document + Swagger UI available in development (`/swagger`)
+- CORS policy for local frontend development
+- Static file serving from `wwwroot`
+- Circular reference handling in JSON serialization
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Runtime | .NET 9 |
+| Framework | ASP.NET Core Web API |
+| ORM | Entity Framework Core 9 |
+| Database | Microsoft SQL Server |
+| Authentication | JWT Bearer (`Microsoft.AspNetCore.Authentication.JwtBearer`) |
+| API Documentation | NSwag / OpenAPI (`NSwag.AspNetCore 14`) |
+| AI Integration | Ollama (local LLM, `llama3.2:3b`) |
+| Email | SMTP via `IEmailService` |
+
+---
+
+## Architecture & Project Structure
 
 ```
-├── Controllers
-│   └── KubeOpsController.cs
-├── Dockerfile
-├── KubernetesLocalProcessConfig.yaml
-├── LICENSE
-├── Models
-│   └── DatabaseConfig.cs
-├── Program.cs
-├── Properties
-│   └── launchSettings.json
-├── README.md
-├── Services
-│   └── APIService.cs
-├── Startup.cs
-├── appsettings.Development.json
-├── bin
-│   └── Debug
-├── configs
-│   └── prod
-├── dotnet-core-web-api.csproj
-├── dotnet-core-web-api.sln
-├── manifests
-│   ├── deployment.yaml
-│   └── service.yaml
->>>>>>> 05ff1ce (update function)
+elearn-server/
+├── Controllers/          # API endpoint controllers (one per domain area)
+├── Data/                 # AppDbContext and EF Core configuration
+├── DTO/                  # Data Transfer Objects for request/response shaping
+├── Migrations/           # EF Core auto-generated migration files
+├── Models/               # Domain entity classes
+├── Request/              # Specialized input request models
+├── Security/             # JWT and token-related utilities
+├── Services/             # Business logic — email, recommendations, etc.
+├── docs/                 # CHANGELOG.md and WORKLOG.md
+├── wwwroot/              # Statically served files (e.g., uploaded images)
+├── Program.cs            # Application bootstrap, DI, middleware pipeline
+├── appsettings.json      # Runtime configuration (connection strings, JWT, SMTP, Ollama)
+└── elearn-server.csproj  # Project file and NuGet package references
 ```
 
-- `Dockerfile` is .NET Core Web API Multistage Dockerfile (following Docker Best Practices)
-- `KubernetesLocalProcessConfig.yaml` is [Bridge to Kubernetes](https://devblogs.microsoft.com/visualstudio/bridge-to-kubernetes-ga/) config to supports developing .NET Core Web API microservice on Kubernetes
-- `configs` folder will contain .NET Core Web API centralized config structure
-- `appsettings.Development.json` is .NET Core Web API development environment config
-- `manifests` folder will contain Kubernetes manifests (deployment, service)
-- `Startup.cs` is .NET Core Web API startup & path routing config
-- `Program.cs` is .NET Core Web API environment variable mapping config
+---
 
-## Setting Up
+## API Reference
 
-To setup this project, you need to clone the git repo
+The API is organized by domain controller. All routes are prefixed with `/api/`.
 
-```sh
-$ git clone https://github.com/kubeopsskills/dotnet-core-web-api.git
-$ cd dotnet-core-web-api
+| Controller | Base Route | Responsibility |
+|---|---|---|
+| `AuthController` | `/api/Auth` | Register, login, logout, password reset |
+| `UserController` | `/api/User` | User profile management |
+| `CourseController` | `/api/Course` | Course CRUD, search, image upload |
+| `CategoryController` | `/api/Category` | Course category management |
+| `LessonController` | `/api/Lesson` | Lesson management per course |
+| `CartController` | `/api/Cart` | Shopping cart and cart items |
+| `OrderController` | `/api/Order` | Order creation and tracking |
+| `OrderdetailController`| `/api/Orderdetail` | Line items within an order |
+| `PaymentController` | `/api/Payment` | Payment confirmation |
+| `EnrollmentController` | `/api/Enrollment` | Learner course enrollments |
+| `CommentController` | `/api/Comment` | Course comments |
+| `CertificateController`| `/api/Certificate` | Certificate issuance |
+| `WishlistController` | `/api/Wishlist` | Learner wishlist |
+| `RecommendationController` | `/api/Recommendation` | AI-powered course recommendations |
+
+> **Swagger UI** is available at `/swagger` when running in the `Development` environment.
+
+---
+
+## Data Model
+
+The database schema covers the following entities:
+
+| Entity | Description |
+|---|---|
+| `User` | Platform accounts (learner / admin) |
+| `Role` | Authorization roles |
+| `Course` | Course metadata, pricing, and content |
+| `Lesson` | Individual lessons belonging to a course |
+| `Category` | Course categories/tags |
+| `Enrollment` | Relation between a user and a course they've joined |
+| `Rating` | Numeric ratings on courses |
+| `Comment` | User comments on courses |
+| `Certificate` | Issued after enrollment completion |
+| `Quiz` / `Assignment` | Assessment entities |
+| `Notification` | In-app user notifications |
+| `Wishlist` | Saved courses per user |
+| `Cart` / `CartItem` | Shopping cart state |
+| `Order` / `OrderDetail` | Purchase records |
+| `Payment` | Payment transaction records |
+| `PasswordResetToken` | Time-limited tokens for password reset |
+| `BlacklistedToken` | Revoked JWT tokens (logout blacklist) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [.NET SDK 9](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [SQL Server](https://www.microsoft.com/en-us/sql-server) (or SQL Server Express)
+- _(Optional)_ [Ollama](https://ollama.com) for AI-powered recommendations
+
+---
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Karhacter/elearn-server.git
+cd elearn-server
 ```
 
-followed by
+### 2. Restore Dependencies
 
-```sh
-$ dotnet restore
+```bash
+dotnet restore
 ```
 
-## Deploying a .NET Core Web API microservice on Kubernetes
+### 3. Configure Application Settings
 
-### Prerequisite:
+Edit `appsettings.json` (or create `appsettings.Development.json` to override locally):
 
-- .NET Core Web API Docker Image
-
-Preparing Config Map for .NET Core Web API microservice
-
-```sh
-$ kubectl apply -k configs/prod
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_SERVER;Database=Elearn_db;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+  "Jwt": {
+    "Key": "YOUR_SECRET_KEY_HERE",
+    "Issuer": "elearn-server",
+    "Audience": "elearn-client",
+    "ExpireDays": 7
+  },
+  "App": {
+    "FrontendBaseUrl": "http://localhost:4200"
+  },
+  "Smtp": {
+    "Host": "smtp.example.com",
+    "Port": "587",
+    "Username": "user@example.com",
+    "Password": "password",
+    "FromEmail": "no-reply@example.com",
+    "FromName": "E-Learn",
+    "EnableSsl": "true"
+  },
+  "Ollama": {
+    "BaseUrl": "http://localhost:11434/",
+    "Model": "llama3.2:3b",
+    "EnableRecommendations": true
+  }
+}
 ```
 
-To deploy the microservice on Kubernetes, run following command:
+> ⚠️ **Never commit real secrets** to source control. Use environment variables or `appsettings.Development.json` (which should be git-ignored) to override sensitive values locally.
 
-```sh
-$ kubectl apply -f manifests
+### 4. Apply Database Migrations
+
+```bash
+dotnet ef database update
 ```
 
-This will deploy it on Kubernetes with the centralized config.
+### 5. Run the API
 
-## Deploying a .NET Core Web API microservice on Azure Container Instance (ACI)
-
-### Prerequisite:
-
-- [ACI Context](https://docs.docker.com/cloud/aci-integration/#run-docker-containers-on-aci)
-
-To deploy the microservice on ACI, run following command:
-
-```sh
-$ docker compose -f aci-docker-compose.yaml up -d
+```bash
+dotnet run
 ```
 
-## Deploying a .NET Core Web API microservice on [AWS App Runner](https://aws.amazon.com/apprunner/) using AWS Copilot
+The API will start on `https://localhost:PORT`. In development mode, Swagger UI is served at `/swagger`.
 
-### Prerequisite:
+---
 
-- [AWS Copilot](https://aws.github.io/copilot-cli/docs/getting-started/install/)
+## Configuration Reference
 
-To deploy the microservice on AWS, following these steps:
+| Key | Description |
+|---|---|
+| `ConnectionStrings:DefaultConnection` | SQL Server connection string |
+| `Jwt:Key` | Secret key for JWT signing (use a strong random value) |
+| `Jwt:Issuer` | JWT issuer claim |
+| `Jwt:Audience` | JWT audience claim |
+| `Jwt:ExpireDays` | Token lifetime in days |
+| `App:FrontendBaseUrl` | Origin URL of the frontend (used in CORS and email links) |
+| `Smtp:Host` | SMTP server hostname |
+| `Smtp:Port` | SMTP server port (default: 587) |
+| `Smtp:Username` | SMTP authentication username |
+| `Smtp:Password` | SMTP authentication password |
+| `Smtp:FromEmail` | Sender email address |
+| `Smtp:EnableSsl` | Whether to use TLS for SMTP |
+| `Ollama:BaseUrl` | Base URL of the local Ollama server |
+| `Ollama:Model` | Ollama model name to use for recommendations |
+| `Ollama:EnableRecommendations` | Toggle AI recommendations on/off |
 
-- Prepare AWS IAM roles and AWS ECR repository for the microservice
+---
 
-```sh
-$ copilot init --app kubeops-demo
+## AI Recommendation Engine
+
+The recommendation module at `POST /api/Recommendation/roadmap-courses` accepts a `RoadmapName` string and returns an ordered list of suggested courses.
+
+**Operating modes:**
+
+| Mode | Trigger | Behavior |
+|---|---|---|
+| **AI Mode** | Ollama running and `EnableRecommendations: true` | Sends roadmap + course candidates to the local LLM for intelligent ranking |
+| **Fallback Mode** | Ollama unavailable or disabled | Ranks courses using internal heuristic scoring rules |
+
+**Setup (local Ollama):**
+
+```bash
+# Install and pull the model
+ollama pull llama3.2:3b
+
+# Start the Ollama server (if not running as a service)
+ollama serve
 ```
 
-- Create the test environment on AWS
+Ensure `Ollama:BaseUrl` in `appsettings.json` points to your running Ollama instance.
 
-```sh
-$ copilot env init --name test --app kubeops-demo
-```
+---
 
-- Deploy the microservice on the test environment
+## Development Notes
 
-```sh
-$ copilot svc deploy --env test
-```
+- **CORS**: The API currently allows requests from the origin specified in `App:FrontendBaseUrl` (default: `http://localhost:4200`). Extend the CORS policy for additional origins as needed.
+- **Static files**: Uploaded assets (e.g., course images) are stored and served from `wwwroot/`.
+- **JSON serialization**: `ReferenceHandler.IgnoreCycles` is configured globally to handle navigation property cycles in EF Core entities.
+- **Merge conflicts**: `Program.cs` and `appsettings.json` currently contain unresolved Git merge conflict markers — these should be cleaned up before any production deployment.
 
-## Learning Resources:
+---
 
-- [.NET Thailand](https://www.dotnetthailand.com/)
-- [Announcing .NET 6 Preview 4](https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-6-preview-4/)
-- [Breaking changes in .NET 6](https://docs.microsoft.com/en-us/dotnet/core/compatibility/6.0)
+## Roadmap
+
+- [ ] Role-based authorization policies for admin and learner workflows
+- [ ] Expanded automated test coverage (unit + integration)
+- [ ] Externalize secrets via environment variables or a secrets manager
+- [ ] Docker support (`Dockerfile` + `docker-compose.yml`)
+- [ ] CI/CD pipeline documentation and GitHub Actions workflow
+- [ ] Dedicated `Roadmap` entity/table to replace string-based roadmap input
+- [ ] Rate limiting and request throttling middleware
+
+---
+
+## Documentation
+
+| Document | Location | Purpose |
+|---|---|---|
+| Change History | [`docs/CHANGELOG.md`](docs/CHANGELOG.md) | Notable changes per session |
+| Implementation Notes | [`docs/WORKLOG.md`](docs/WORKLOG.md) | Ongoing developer work log |
+
+---
+
+## License
+
+This repository does not currently declare an open-source license. If you plan to distribute or reuse this project publicly, please add an appropriate license file (e.g., MIT, Apache 2.0).
