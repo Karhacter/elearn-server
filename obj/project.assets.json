@@ -8543,11 +8543,25 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
+=======
     "C:\\Users\\Diem\\.nuget\\packages\\": {}
+>>>>>>> b9eee7b (wip: save today's work)
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
+      "projectUniqueName": "C:\\Projects\\elearn-server\\elearn-server.csproj",
+      "projectName": "elearn-server",
+      "projectPath": "C:\\Projects\\elearn-server\\elearn-server.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Projects\\elearn-server\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+=======
       "projectUniqueName": "D:\\Dev\\Dự Án ELearn\\elearn-server\\elearn-server.csproj",
       "projectName": "elearn-server",
       "projectPath": "D:\\Dev\\Dự Án ELearn\\elearn-server\\elearn-server.csproj",
@@ -8557,6 +8571,7 @@
       "configFilePaths": [
         "C:\\Users\\Diem\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+>>>>>>> b9eee7b (wip: save today's work)
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -8661,7 +8676,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+=======
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+>>>>>>> b9eee7b (wip: save today's work)
       }
     }
   }
