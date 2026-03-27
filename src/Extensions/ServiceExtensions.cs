@@ -1,0 +1,82 @@
+using elearn_server.Application.Interfaces;
+using elearn_server.Common.Options;
+using elearn_server.Domain.Interfaces;
+using elearn_server.Infrastructure.Persistence;
+using elearn_server.Infrastructure.Persistence.Repositories;
+using elearn_server.Infrastructure.Services;
+using elearn_server.Infrastructure.Services.Commerce;
+
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace elearn_server.Extensions;
+
+public static class ServiceExtensions
+{
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<AppDbContext>(opt =>
+            opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        return services;
+    }
+
+    public static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.Configure<AuthSecurityOptions>(configuration.GetSection(AuthSecurityOptions.SectionName));
+        services.Configure<OllamaOptions>(configuration.GetSection(OllamaOptions.SectionName));
+        return services;
+    }
+
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IWishlistRepository, WishlistRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<ICertificateRepository, CertificateRepository>();
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
+        // Infrastructure services
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IFileStorageService, FileStorageService>();
+        services.AddHttpClient();
+        services.AddScoped<ICourseRecommendationService, CourseRecommendationService>();
+
+        // Core services
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<ICourseService, CourseService>();
+
+        // Commerce services
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderDetailService, OrderDetailService>();
+        services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<IPaymentService, PaymentService>();
+        services.AddScoped<IEnrollmentService, EnrollmentService>();
+        services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<ICertificateService, CertificateService>();
+        return services;
+    }
+
+    public static IServiceCollection AddValidation(this IServiceCollection services)
+    {
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<Program>();
+        return services;
+    }
+}

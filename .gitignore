@@ -482,3 +482,13 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+
+# Custom secrets and environments
+appsettings.Local.json
+.env    
+*.pfx
+*.key
+
+# Docker
+.dockerignore

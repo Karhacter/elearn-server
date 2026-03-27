@@ -1,0 +1,30 @@
+services:
+  # Dịch vụ Database (Ví dụ dùng SQL Server)
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: elearn_db
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Khanh@123
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  # Dịch vụ API của bạn
+  api:
+    image: elearn_server_image
+    container_name: elearn_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080" # Map port 5000 máy thật vào 8080 của container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ELearnDB;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=True
+    depends_on:
+      - db
+
+volumes:
+  sql_data:
