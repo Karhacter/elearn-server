@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using elearn_server.Domain.Enums;
 namespace elearn_server.Domain.Entities
 {
     public class Payment
@@ -32,5 +32,7 @@ namespace elearn_server.Domain.Entities
         [Required(ErrorMessage = "Payment method is required")]
         [StringLength(20, ErrorMessage = "Method cannot exceed 20 characters")]
         public string Method { get; set; } = "Credit Card";
+
+        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid;
     }
 }

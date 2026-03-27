@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using elearn_server.Domain.Entities;
-
+using elearn_server.Domain.Enums;
 namespace elearn_server.Domain.Entities;
 
 public class Order : BaseEntity
@@ -27,10 +26,7 @@ public class Order : BaseEntity
     [Required(ErrorMessage = "User ID is required")]
     public int user_id { get; set; }
 
-    public int StatusOrderId { get; set; }
-
-    [ForeignKey("StatusOrderId")]
-    public StatusOrder StatusOrder { get; set; }
-
     public ICollection<OrderDetail> OrderDetails { get; set; }
+
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 }

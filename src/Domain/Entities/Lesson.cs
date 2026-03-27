@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Domain.Entities;
 
@@ -12,9 +13,8 @@ public class Lesson : BaseEntity
     [MaxLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
     public string Title { get; set; }
 
-    [Required(ErrorMessage = "Content URL is required")]
     [Url(ErrorMessage = "Invalid URL format")]
-    public string ContentUrl { get; set; }
+    public string? ContentUrl { get; set; }
 
     [Range(1, 1000, ErrorMessage = "Duration must be between 1 and 1000 minutes")]
     public int Duration { get; set; }
@@ -22,8 +22,16 @@ public class Lesson : BaseEntity
     [Range(1, int.MaxValue, ErrorMessage = "Order must be greater than 0")]
     public int Order { get; set; }
 
-    [ForeignKey("Course")]
+    [Required]
+    public LessonType Type { get; set; } = LessonType.Video;
+
+    [ForeignKey(nameof(CourseSection))]
+    [Required(ErrorMessage = "Section ID is required")]
+    public int SectionId { get; set; }
+    public CourseSection? CourseSection { get; set; }
+
+    [ForeignKey(nameof(Course))]
     [Required(ErrorMessage = "Course ID is required")]
     public int CourseId { get; set; }
-    public Course Course { get; set; }
+    public Course? Course { get; set; }
 }

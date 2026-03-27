@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Application.Requests
 {
@@ -9,7 +10,7 @@ namespace elearn_server.Application.Requests
         public string Phone { get; set; }
         public string Address { get; set; }
         public string Note { get; set; }
-        public int StatusOrderId { get; set; }
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public int UserId { get; set; }
         public List<OrderItemRequest> Items { get; set; }
     }

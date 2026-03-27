@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using elearn_server.Application.Requests;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Application.DTOs
 {
@@ -8,9 +10,9 @@ namespace elearn_server.Application.DTOs
     {
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "The StatusOrderId field is required.")]
-        [JsonPropertyName("StatusOrder")]
-        public int StatusOrderId { get; set; } // sửa từ string Status → int StatusOrderId
+        [Required(ErrorMessage = "The Status field is required.")]
+        [JsonPropertyName("status")]
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
         [Required(ErrorMessage = "The Items field is required.")]
         [MinLength(1, ErrorMessage = "The Items field must contain at least one item.")]

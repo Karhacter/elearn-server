@@ -41,6 +41,13 @@ public class CourseUpsertRequest
 
     [Required]
     public int InstructorId { get; set; }
+
+    [MaxLength(200)]
+    public string? Slug { get; set; }
+
+    public List<string> LearningOutcomes { get; set; } = new();
+    public List<string> Requirements { get; set; } = new();
+    public List<string> TargetAudiences { get; set; } = new();
 }
 
 public class UserUpdateRequest
@@ -145,4 +152,85 @@ public class OrderDetailUpsertRequest
 
     [Range(1, int.MaxValue)]
     public int Quantity { get; set; }
+}
+
+public class SectionCreateRequest
+{
+    [Required]
+    [MaxLength(150)]
+    public string Title { get; set; } = string.Empty;
+
+    [MaxLength(1000)]
+    public string? Description { get; set; }
+
+    public int? Order { get; set; }
+}
+
+public class SectionUpdateRequest
+{
+    [Required]
+    [MaxLength(150)]
+    public string Title { get; set; } = string.Empty;
+
+    [MaxLength(1000)]
+    public string? Description { get; set; }
+
+    public int? Order { get; set; }
+}
+
+public class LessonCreateRequest
+{
+    [Required]
+    [MaxLength(100)]
+    public string Title { get; set; } = string.Empty;
+
+    [Url]
+    public string? ContentUrl { get; set; }
+
+    [Range(1, 1000)]
+    public int Duration { get; set; }
+
+    [Required]
+    public string Type { get; set; } = "Video";
+
+    public int? Order { get; set; }
+}
+
+public class LessonUpdateRequest
+{
+    [Required]
+    [MaxLength(100)]
+    public string Title { get; set; } = string.Empty;
+
+    [Url]
+    public string? ContentUrl { get; set; }
+
+    [Range(1, 1000)]
+    public int Duration { get; set; }
+
+    [Required]
+    public string Type { get; set; } = "Video";
+
+    public int? Order { get; set; }
+}
+
+public class ReorderItemRequest
+{
+    [Required]
+    public int Id { get; set; }
+
+    [Range(1, int.MaxValue)]
+    public int Order { get; set; }
+}
+
+public class SectionReorderRequest
+{
+    [Required]
+    public List<ReorderItemRequest> Sections { get; set; } = new();
+}
+
+public class LessonReorderRequest
+{
+    [Required]
+    public List<ReorderItemRequest> Lessons { get; set; } = new();
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using elearn_server.Domain.Entities;
 
 namespace elearn_server.Infrastructure.Persistence;
@@ -8,10 +8,13 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-    public DbSet<Course> todoItems { get; set; } = null!;
     public DbSet<User> Users { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<CourseSection> CourseSections { get; set; }
+    public DbSet<LearningOutcome> LearningOutcomes { get; set; }
+    public DbSet<CourseRequirement> CourseRequirements { get; set; }
+    public DbSet<CourseTargetAudience> CourseTargetAudiences { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Rating> Ratings { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -24,8 +27,8 @@ public class AppDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<Wishlist> Wishlists { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<OrderDetail> orderDetails { get; set; }
-    public DbSet<StatusOrder> StatusOrders { get; set; }
+    public DbSet<OrderDetail> OrderDetails { get; set; }
+
     public DbSet<Cart> Carts { get; set; }
 
     public DbSet<CartItem> CartItems { get; set; }
@@ -44,6 +47,8 @@ public class AppDbContext : DbContext
 
         var sensitiveEntities = new[] { typeof(User), typeof(Course) };
 
+
+
         // Loop through all entities and foreign keys
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
@@ -57,6 +62,17 @@ public class AppDbContext : DbContext
             }
         }
         // Relationships and Constraints
+        modelBuilder.Entity<Course>()
+                       .Property(c => c.Status)
+                       .HasConversion<string>();
+
+        modelBuilder.Entity<Course>()
+            .HasIndex(c => c.Slug)
+            .IsUnique();
+
+        modelBuilder.Entity<Lesson>()
+            .Property(l => l.Type)
+            .HasConversion<string>();
 
         // User - Enrollment (One-to-Many)
         modelBuilder.Entity<Enrollment>()
@@ -70,11 +86,46 @@ public class AppDbContext : DbContext
             .WithMany(c => c.Enrollments)
             .HasForeignKey(e => e.CourseId);
 
-        // Course - Lesson (One-to-Many)
+        // Course - Section (One-to-Many)
+        modelBuilder.Entity<CourseSection>()
+            .HasOne(s => s.Course)
+            .WithMany(c => c.Sections)
+            .HasForeignKey(s => s.CourseId);
+
+        modelBuilder.Entity<CourseSection>()
+            .HasIndex(s => new { s.CourseId, s.Order })
+            .IsUnique();
+
+        // Section - Lesson (One-to-Many)
+        modelBuilder.Entity<Lesson>()
+            .HasOne(l => l.CourseSection)
+            .WithMany(s => s.Lessons)
+            .HasForeignKey(l => l.SectionId);
+
+        modelBuilder.Entity<Lesson>()
+            .HasIndex(l => new { l.SectionId, l.Order })
+            .IsUnique();
+
         modelBuilder.Entity<Lesson>()
             .HasOne(l => l.Course)
             .WithMany(c => c.Lessons)
             .HasForeignKey(l => l.CourseId);
+
+        modelBuilder.Entity<LearningOutcome>()
+            .HasOne(lo => lo.Course)
+            .WithMany(c => c.LearningOutcomes)
+            .HasForeignKey(lo => lo.CourseId);
+
+        modelBuilder.Entity<CourseRequirement>()
+            .HasOne(r => r.Course)
+            .WithMany(c => c.Requirements)
+            .HasForeignKey(r => r.CourseId);
+
+        modelBuilder.Entity<CourseTargetAudience>()
+            .HasOne(t => t.Course)
+            .WithMany(c => c.TargetAudiences)
+            .HasForeignKey(t => t.CourseId);
+
 
         // User - Rating (One-to-Many)
         modelBuilder.Entity<Rating>()
@@ -93,6 +144,14 @@ public class AppDbContext : DbContext
             .HasOne(p => p.User)
             .WithMany(u => u.Payments)
             .HasForeignKey(p => p.UserId);
+
+        modelBuilder.Entity<Order>()
+                    .Property(o => o.Status)
+                    .HasConversion<string>(); // "Pending", "Completed"...
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Status)
+            .HasConversion<string>();
 
         // Payment - Course (One-to-Many)
         modelBuilder.Entity<Payment>()
@@ -169,6 +228,25 @@ public class AppDbContext : DbContext
             .HasOne(w => w.Course)
             .WithMany(c => c.Wishlists)
             .HasForeignKey(w => w.CourseId);
+
+        // Email của User là duy nhất
+        modelBuilder.Entity<User>()
+        .HasIndex(u => u.Email)
+        .IsUnique();
+
+        // Một User chỉ được Enrollment (ghi danh) vào một Course MỘT LẦN DUY NHẤT
+        modelBuilder.Entity<Enrollment>()
+            .HasIndex(e => new { e.UserId, e.CourseId })
+            .IsUnique();
+
+        // Seed Data
+        modelBuilder.Entity<Role>().HasData(
+            new Role { Id = 1, RoleName = "Admin" },
+            new Role { Id = 2, RoleName = "Instructor" },
+            new Role { Id = 3, RoleName = "Student" }
+        );
+
+
     }
 }
 

@@ -21,7 +21,6 @@ namespace elearn_server.Domain.Entities
 
         public bool IsRead { get; set; } = false;
 
-        [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     }
 }

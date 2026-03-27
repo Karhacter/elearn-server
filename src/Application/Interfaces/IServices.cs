@@ -54,6 +54,17 @@ public interface ICourseService
     Task<ServiceResult<ImageUploadResponse>> UpdateImageAsync(int id, string imageUrl);
     Task<ServiceResult<ImageUploadResponse>> UploadImageAsync(int id, IFormFile imageFile, CancellationToken cancellationToken);
     Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> SearchAsync(string? keyword, int? genreId, int? instructorId);
+    Task<ServiceResult<CoursePreviewResponse>> PreviewAsync(int courseId);
+    Task<ServiceResult<CourseResponse>> PublishAsync(int courseId, bool isAdmin);
+    Task<ServiceResult<CourseResponse>> UnpublishAsync(int courseId);
+    Task<ServiceResult<SectionResponse>> CreateSectionAsync(int courseId, SectionCreateRequest request);
+    Task<ServiceResult<SectionResponse>> UpdateSectionAsync(int courseId, int sectionId, SectionUpdateRequest request);
+    Task<ServiceResult<object>> DeleteSectionAsync(int courseId, int sectionId);
+    Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> ReorderSectionsAsync(int courseId, SectionReorderRequest request);
+    Task<ServiceResult<LessonResponse>> CreateLessonAsync(int courseId, int sectionId, LessonCreateRequest request);
+    Task<ServiceResult<LessonResponse>> UpdateLessonAsync(int courseId, int sectionId, int lessonId, LessonUpdateRequest request);
+    Task<ServiceResult<object>> DeleteLessonAsync(int courseId, int sectionId, int lessonId);
+    Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int courseId, int sectionId, LessonReorderRequest request);
 }
 
 public interface IOrderService

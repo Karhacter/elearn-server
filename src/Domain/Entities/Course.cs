@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.ConstrainedExecution;
-using elearn_server.Domain.Entities;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Domain.Entities;
 
@@ -47,6 +46,10 @@ public class Course : BaseEntity
     public int InstructorId { get; set; }
     public User? Instructor { get; set; }
 
+    [MaxLength(200)]
+    public string? Slug { get; set; }
+
+    public CourseStatus Status { get; set; } = CourseStatus.Draft; // Mặc định là Draft
     // One - to - Many || Relationships and Constraints
     public ICollection<Enrollment>? Enrollments { get; set; }      // User's course enrollments
     public ICollection<Payment>? Payments { get; set; }      // User's course enrollments
@@ -56,5 +59,9 @@ public class Course : BaseEntity
     public ICollection<Comment>? Comments { get; set; }
     public ICollection<Wishlist>? Wishlists { get; set; }
     public ICollection<Lesson>? Lessons { get; set; }
+    public ICollection<CourseSection>? Sections { get; set; }
+    public ICollection<LearningOutcome>? LearningOutcomes { get; set; }
+    public ICollection<CourseRequirement>? Requirements { get; set; }
+    public ICollection<CourseTargetAudience>? TargetAudiences { get; set; }
     public ICollection<Rating>? Ratings { get; set; }
 }

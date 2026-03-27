@@ -1,4 +1,5 @@
-﻿using elearn_server.Application.Responses;
+﻿
+using elearn_server.Application.Responses;
 using elearn_server.Domain.Entities;
 
 namespace elearn_server.Application.Mappings;
@@ -27,6 +28,8 @@ public static class EntityMappings
         CourseId = course.CourseId,
         Title = course.Title,
         Description = course.Description,
+        Slug = course.Slug,
+        Status = course.Status.ToString(),
         Price = course.Price,
         Discount = course.Discount,
         GenreId = course.GenreId,
@@ -35,7 +38,43 @@ public static class EntityMappings
         Thumbnail = course.Thumbnail,
         Duration = course.Duration,
         InstructorId = course.InstructorId,
-        InstructorName = course.Instructor?.FullName
+        InstructorName = course.Instructor?.FullName,
+        LearningOutcomes = course.LearningOutcomes?.OrderBy(o => o.Order).Select(o => o.Content).ToList() ?? new List<string>(),
+        Requirements = course.Requirements?.OrderBy(r => r.Order).Select(r => r.Content).ToList() ?? new List<string>(),
+        TargetAudiences = course.TargetAudiences?.OrderBy(t => t.Order).Select(t => t.Content).ToList() ?? new List<string>()
+    };
+
+    public static SectionResponse ToResponse(this CourseSection section) => new()
+    {
+        SectionId = section.SectionId,
+        Title = section.Title,
+        Description = section.Description,
+        Order = section.Order,
+        Lessons = section.Lessons?.OrderBy(l => l.Order).Select(ToResponse).ToList() ?? new List<LessonResponse>()
+    };
+
+    public static LessonResponse ToResponse(this Lesson lesson) => new()
+    {
+        LessonId = lesson.LessonId,
+        Title = lesson.Title,
+        ContentUrl = lesson.ContentUrl,
+        Type = lesson.Type.ToString(),
+        Duration = lesson.Duration,
+        Order = lesson.Order,
+        SectionId = lesson.SectionId
+    };
+
+    public static CoursePreviewResponse ToPreviewResponse(this Course course) => new()
+    {
+        CourseId = course.CourseId,
+        Title = course.Title,
+        Description = course.Description,
+        Slug = course.Slug,
+        Status = course.Status.ToString(),
+        LearningOutcomes = course.LearningOutcomes?.OrderBy(o => o.Order).Select(o => o.Content).ToList() ?? new List<string>(),
+        Requirements = course.Requirements?.OrderBy(r => r.Order).Select(r => r.Content).ToList() ?? new List<string>(),
+        TargetAudiences = course.TargetAudiences?.OrderBy(t => t.Order).Select(t => t.Content).ToList() ?? new List<string>(),
+        Sections = course.Sections?.OrderBy(s => s.Order).Select(ToResponse).ToList() ?? new List<SectionResponse>()
     };
 
     public static OrderDetailResponse ToResponse(this OrderDetail detail) => new()
@@ -57,8 +96,7 @@ public static class EntityMappings
         Email = order.Email,
         Address = order.Address,
         UserId = order.user_id,
-        StatusOrderId = order.StatusOrderId,
-        StatusName = order.StatusOrder?.Name,
+        Status = order.Status.ToString(),
         Items = order.OrderDetails?.Select(ToResponse).ToList() ?? new List<OrderDetailResponse>()
     };
 
@@ -109,4 +147,5 @@ public static class EntityMappings
         CertificateUrl = certificate.CertificateUrl,
         DateIssued = certificate.DateIssued
     };
+
 }
