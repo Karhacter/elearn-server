@@ -21,6 +21,10 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Certificate> Certificates { get; set; }
     public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<QuizQuestion> QuizQuestions { get; set; }
+    public DbSet<QuizAnswerOption> QuizAnswerOptions { get; set; }
+    public DbSet<QuizAttempt> QuizAttempts { get; set; }
+    public DbSet<QuizAttemptAnswer> QuizAttemptAnswers { get; set; }
     public DbSet<Assignment> Assignments { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
@@ -28,6 +32,9 @@ public class AppDbContext : DbContext
     public DbSet<Wishlist> Wishlists { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<CourseProgress> CourseProgresses { get; set; }
+    public DbSet<LessonProgress> LessonProgresses { get; set; }
+    public DbSet<LessonCompletion> LessonCompletions { get; set; }
 
     public DbSet<Cart> Carts { get; set; }
 
@@ -61,10 +68,16 @@ public class AppDbContext : DbContext
                 }
             }
         }
+
+
+
         // Relationships and Constraints
         modelBuilder.Entity<Course>()
-                       .Property(c => c.Status)
-                       .HasConversion<string>();
+            .ToTable("Course");
+
+        modelBuilder.Entity<Course>()
+            .Property(c => c.Status)
+            .HasConversion<string>();
 
         modelBuilder.Entity<Course>()
             .HasIndex(c => c.Slug)
@@ -126,6 +139,72 @@ public class AppDbContext : DbContext
             .WithMany(c => c.TargetAudiences)
             .HasForeignKey(t => t.CourseId);
 
+        modelBuilder.Entity<CourseProgress>()
+            .HasIndex(cp => new { cp.UserId, cp.CourseId })
+            .IsUnique();
+
+        modelBuilder.Entity<CourseProgress>()
+            .HasOne(cp => cp.User)
+            .WithMany()
+            .HasForeignKey(cp => cp.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<CourseProgress>()
+            .HasOne(cp => cp.Course)
+            .WithMany()
+            .HasForeignKey(cp => cp.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<CourseProgress>()
+            .HasOne(cp => cp.LastViewedLesson)
+            .WithMany()
+            .HasForeignKey(cp => cp.LastViewedLessonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonProgress>()
+            .HasIndex(lp => new { lp.UserId, lp.LessonId })
+            .IsUnique();
+
+        modelBuilder.Entity<LessonProgress>()
+            .HasOne(lp => lp.User)
+            .WithMany()
+            .HasForeignKey(lp => lp.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonProgress>()
+            .HasOne(lp => lp.Course)
+            .WithMany()
+            .HasForeignKey(lp => lp.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonProgress>()
+            .HasOne(lp => lp.Lesson)
+            .WithMany()
+            .HasForeignKey(lp => lp.LessonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonCompletion>()
+            .HasIndex(lc => new { lc.UserId, lc.LessonId })
+            .IsUnique();
+
+        modelBuilder.Entity<LessonCompletion>()
+            .HasOne(lc => lc.User)
+            .WithMany()
+            .HasForeignKey(lc => lc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonCompletion>()
+            .HasOne(lc => lc.Course)
+            .WithMany()
+            .HasForeignKey(lc => lc.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LessonCompletion>()
+            .HasOne(lc => lc.Lesson)
+            .WithMany()
+            .HasForeignKey(lc => lc.LessonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
 
         // User - Rating (One-to-Many)
         modelBuilder.Entity<Rating>()
@@ -176,6 +255,62 @@ public class AppDbContext : DbContext
             .HasOne(q => q.Course)
             .WithMany(c => c.Quizzes)
             .HasForeignKey(q => q.CourseId);
+
+        modelBuilder.Entity<QuizQuestion>()
+            .Property(q => q.Type)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<QuizAttempt>()
+            .Property(a => a.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<QuizQuestion>()
+            .HasOne(q => q.Quiz)
+            .WithMany(qz => qz.Questions)
+            .HasForeignKey(q => q.QuizId);
+
+        modelBuilder.Entity<QuizQuestion>()
+            .HasIndex(q => new { q.QuizId, q.Order })
+            .IsUnique();
+
+        modelBuilder.Entity<QuizAnswerOption>()
+            .HasOne(o => o.Question)
+            .WithMany(q => q.Options)
+            .HasForeignKey(o => o.QuestionId);
+
+        modelBuilder.Entity<QuizAnswerOption>()
+            .HasIndex(o => new { o.QuestionId, o.Order })
+            .IsUnique();
+
+        modelBuilder.Entity<QuizAttempt>()
+            .HasOne(a => a.Quiz)
+            .WithMany(q => q.Attempts)
+            .HasForeignKey(a => a.QuizId);
+
+        modelBuilder.Entity<QuizAttempt>()
+            .HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<QuizAttempt>()
+            .HasIndex(a => new { a.UserId, a.QuizId, a.AttemptNumber })
+            .IsUnique();
+
+        modelBuilder.Entity<QuizAttemptAnswer>()
+            .HasOne(a => a.Attempt)
+            .WithMany(at => at.Answers)
+            .HasForeignKey(a => a.AttemptId);
+
+        modelBuilder.Entity<QuizAttemptAnswer>()
+            .HasOne(a => a.Question)
+            .WithMany(q => q.AttemptAnswers)
+            .HasForeignKey(a => a.QuestionId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<QuizAttemptAnswer>()
+            .HasIndex(a => new { a.AttemptId, a.QuestionId })
+            .IsUnique();
 
         // Assignment - Course (One-to-Many)
         modelBuilder.Entity<Assignment>()

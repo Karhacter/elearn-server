@@ -50,10 +50,14 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> SearchCourses([FromQuery] string? keyword, [FromQuery] int? genreId, [FromQuery] int? instructorId) =>
         FromResult(await courseService.SearchAsync(keyword, genreId, instructorId));
 
+
+    // Preview course for instructors and admins before publishing
     [HttpGet("{id}/preview")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> PreviewCourse(int id) => FromResult(await courseService.PreviewAsync(id));
 
+
+    // Publish and unpublish courses (only admins can publish, instructors can only unpublish their own courses)
     [HttpPost("{id}/publish")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> PublishCourse(int id) =>
@@ -64,11 +68,17 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> UnpublishCourse(int id) =>
         FromResult(await courseService.UnpublishAsync(id));
 
+    //
+
+
+    // Add, update, and delete sections and lessons within a course
     [HttpPost("{courseId}/sections")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> CreateSection(int courseId, [FromBody] SectionCreateRequest request) =>
         FromResult(await courseService.CreateSectionAsync(courseId, request));
 
+
+    // Update and delete sections and lessons, and reorder sections and lessons within a course
     [HttpPut("{courseId}/sections/{sectionId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> UpdateSection(int courseId, int sectionId, [FromBody] SectionUpdateRequest request) =>
@@ -79,26 +89,34 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> DeleteSection(int courseId, int sectionId) =>
         FromResult(await courseService.DeleteSectionAsync(courseId, sectionId));
 
+
+    // Reorder sections within a course
     [HttpPost("{courseId}/sections/reorder")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> ReorderSections(int courseId, [FromBody] SectionReorderRequest request) =>
         FromResult(await courseService.ReorderSectionsAsync(courseId, request));
 
+    // Create Lesssons within a section
     [HttpPost("{courseId}/sections/{sectionId}/lessons")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> CreateLesson(int courseId, int sectionId, [FromBody] LessonCreateRequest request) =>
         FromResult(await courseService.CreateLessonAsync(courseId, sectionId, request));
 
+
+    // Update  lessons
     [HttpPut("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> UpdateLesson(int courseId, int sectionId, int lessonId, [FromBody] LessonUpdateRequest request) =>
         FromResult(await courseService.UpdateLessonAsync(courseId, sectionId, lessonId, request));
 
+
+    // Delete a lesson from a section
     [HttpDelete("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> DeleteLesson(int courseId, int sectionId, int lessonId) =>
         FromResult(await courseService.DeleteLessonAsync(courseId, sectionId, lessonId));
 
+    // Reorder lessons within a section
     [HttpPost("{courseId}/sections/{sectionId}/lessons/reorder")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> ReorderLessons(int courseId, int sectionId, [FromBody] LessonReorderRequest request) =>

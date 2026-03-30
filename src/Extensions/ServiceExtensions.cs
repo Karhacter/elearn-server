@@ -4,6 +4,12 @@ using elearn_server.Domain.Interfaces;
 using elearn_server.Infrastructure.Persistence;
 using elearn_server.Infrastructure.Persistence.Repositories;
 using elearn_server.Infrastructure.Services;
+using elearn_server.Infrastructure.Services.Core.Auth;
+using elearn_server.Infrastructure.Services.Core.Categories;
+using elearn_server.Infrastructure.Services.Core.Courses;
+using elearn_server.Infrastructure.Services.Core.Progress;
+using elearn_server.Infrastructure.Services.Core.Quizzes;
+using elearn_server.Infrastructure.Services.Core.Users;
 using elearn_server.Infrastructure.Services.Commerce;
 
 using FluentValidation;
@@ -43,6 +49,8 @@ public static class ServiceExtensions
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<ICertificateRepository, CertificateRepository>();
+        services.AddScoped<IProgressRepository, ProgressRepository>();
+        services.AddScoped<IQuizRepository, QuizRepository>();
         return services;
     }
 
@@ -59,6 +67,8 @@ public static class ServiceExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<IProgressService, ProgressService>();
+        services.AddScoped<IQuizService, QuizService>();
 
         // Commerce services
         services.AddScoped<IOrderService, OrderService>();

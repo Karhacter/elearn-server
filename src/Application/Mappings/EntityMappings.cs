@@ -30,6 +30,7 @@ public static class EntityMappings
         Description = course.Description,
         Slug = course.Slug,
         Status = course.Status.ToString(),
+        IsSequential = course.IsSequential,
         Price = course.Price,
         Discount = course.Discount,
         GenreId = course.GenreId,

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Application.Requests;
 
@@ -45,6 +46,8 @@ public class CourseUpsertRequest
     [MaxLength(200)]
     public string? Slug { get; set; }
 
+    public bool IsSequential { get; set; }
+
     public List<string> LearningOutcomes { get; set; } = new();
     public List<string> Requirements { get; set; } = new();
     public List<string> TargetAudiences { get; set; } = new();
@@ -79,6 +82,77 @@ public class UpdateImageRequest
 {
     [Required]
     public string ImageUrl { get; set; } = string.Empty;
+}
+
+public class LessonResumePositionRequest
+{
+    [Range(0, int.MaxValue)]
+    public int WatchPositionSeconds { get; set; }
+}
+
+public class QuizUpsertRequest
+{
+    [Required]
+    public int CourseId { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string Title { get; set; } = string.Empty;
+
+    [Range(0, 100)]
+    public double PassScore { get; set; } = 70;
+
+    [Range(1, 720)]
+    public int? TimeLimitMinutes { get; set; }
+
+    [Range(1, 20)]
+    public int MaxAttempts { get; set; } = 3;
+
+    public bool IsRandomOrderEnabled { get; set; }
+}
+
+public class QuizAnswerOptionUpsertRequest
+{
+    [Required]
+    [MaxLength(500)]
+    public string Content { get; set; } = string.Empty;
+
+    public bool IsCorrect { get; set; }
+
+    [Range(1, 1000)]
+    public int Order { get; set; } = 1;
+}
+
+public class QuizQuestionUpsertRequest
+{
+    [Required]
+    [MaxLength(1000)]
+    public string Content { get; set; } = string.Empty;
+
+    [Required]
+    public QuizQuestionType Type { get; set; } = QuizQuestionType.SingleChoice;
+
+    [Range(1, 100)]
+    public int Points { get; set; } = 1;
+
+    [Range(1, 1000)]
+    public int Order { get; set; } = 1;
+
+    [MaxLength(1000)]
+    public string? CorrectTextAnswer { get; set; }
+
+    public List<QuizAnswerOptionUpsertRequest> Options { get; set; } = new();
+}
+
+public class QuizAttemptAnswerRequest
+{
+    [Required]
+    public int QuestionId { get; set; }
+
+    public List<int> SelectedOptionIds { get; set; } = new();
+
+    [MaxLength(1000)]
+    public string? TextAnswer { get; set; }
 }
 
 public class WishlistCreateRequest
