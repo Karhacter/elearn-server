@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace elearn_server.Domain.Entities
 {
-    public class Assignment
+    public class Assignment : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,5 +26,6 @@ namespace elearn_server.Domain.Entities
         [Required(ErrorMessage = "Due Date is required")]
         public DateTime DueDate { get; set; }
 
+        public ICollection<AssignmentSubmission>? Submissions { get; set; }
     }
 }

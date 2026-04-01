@@ -207,6 +207,31 @@ public class QuizResultSummaryResponse
     public QuizAttemptResultResponse? LatestAttempt { get; set; }
 }
 
+public class AssignmentResponse
+{
+    public int Id { get; set; }
+    public int CourseId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public DateTime DueDate { get; set; }
+}
+
+public class AssignmentSubmissionResponse
+{
+    public int Id { get; set; }
+    public int AssignmentId { get; set; }
+    public int StudentId { get; set; }
+    public string? StudentName { get; set; }
+    public string? FileUrl { get; set; }
+    public string? TextSubmission { get; set; }
+    public DateTime SubmittedAt { get; set; }
+    public bool IsLate { get; set; }
+    public double? Grade { get; set; }
+    public string? InstructorFeedback { get; set; }
+    public int? GradedByInstructorId { get; set; }
+    public DateTime? GradedAt { get; set; }
+}
+
 public class OrderDetailResponse
 {
     public int Id { get; set; }
@@ -269,11 +294,61 @@ public class CommentResponse
     public DateTime CommentDate { get; set; }
 }
 
+public class ReviewResponse
+{
+    public int RatingId { get; set; }
+    public int UserId { get; set; }
+    public string? UserName { get; set; }
+    public int CourseId { get; set; }
+    public int Score { get; set; }
+    public string? Comment { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string? ReplyContent { get; set; }
+    public DateTime? ReplyTimestamp { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class CourseRatingSummaryResponse
+{
+    public int CourseId { get; set; }
+    public double AverageRating { get; set; }
+    public int TotalReviews { get; set; }
+    public int OneStarCount { get; set; }
+    public int TwoStarCount { get; set; }
+    public int ThreeStarCount { get; set; }
+    public int FourStarCount { get; set; }
+    public int FiveStarCount { get; set; }
+}
+
 public class CertificateResponse
 {
     public int Id { get; set; }
     public int UserId { get; set; }
     public int CourseId { get; set; }
+    public string CertificateUrl { get; set; } = string.Empty;
+    public string? VerificationCode { get; set; }
+    public DateTime DateIssued { get; set; }
+}
+
+public class CertificateEligibilityResponse
+{
+    public int UserId { get; set; }
+    public int CourseId { get; set; }
+    public bool IsEligible { get; set; }
+    public bool HasCompletedRequiredLessons { get; set; }
+    public bool HasPassedFinalQuiz { get; set; }
+    public bool HasAttendanceViolation { get; set; }
+    public int CompletedLessons { get; set; }
+    public int TotalRequiredLessons { get; set; }
+    public int? FinalQuizId { get; set; }
+}
+
+public class CertificateVerificationResponse
+{
+    public int CertificateId { get; set; }
+    public int UserId { get; set; }
+    public int CourseId { get; set; }
+    public string VerificationCode { get; set; } = string.Empty;
     public string CertificateUrl { get; set; } = string.Empty;
     public DateTime DateIssued { get; set; }
 }

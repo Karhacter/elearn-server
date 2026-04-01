@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using elearn_server.Application.Common;
 using elearn_server.Application.Requests;
 using elearn_server.Application.Responses;
@@ -12,7 +12,7 @@ public interface IAuthService
     Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetUsersAsync();
     Task<ServiceResult<AuthenticatedUserResponse>> GetUserByIdAsync(int id);
     Task<ServiceResult<LoginResponse>> LoginAsync(UserLoginDTO request, string? ipAddress, string? userAgent);
-    Task<ServiceResult<AuthenticatedUserResponse>> RegisterAsync(UserCreateDTO request, string verificationBaseUrl);
+    Task<ServiceResult<AuthenticatedUserResponse>> RegisterAsync(RegisterUserDTO request, string verificationBaseUrl);
     Task<ServiceResult<LoginResponse>> RefreshTokenAsync(RefreshTokenRequestDTO request, string? ipAddress, string? userAgent);
     Task<ServiceResult<object>> VerifyEmailAsync(VerifyEmailRequestDTO request);
     Task<ServiceResult<object>> ForgotPasswordAsync(ForgotPasswordRequestDTO request);
@@ -90,6 +90,18 @@ public interface IQuizService
     Task<ServiceResult<QuizResultSummaryResponse>> GetMyResultSummaryAsync(int quizId, int userId);
 }
 
+public interface IAssignmentService
+{
+    Task<ServiceResult<AssignmentResponse>> CreateAssignmentAsync(AssignmentUpsertRequest request);
+    Task<ServiceResult<AssignmentResponse>> UpdateAssignmentAsync(int assignmentId, AssignmentUpsertRequest request);
+    Task<ServiceResult<object>> DeleteAssignmentAsync(int assignmentId);
+    Task<ServiceResult<IReadOnlyCollection<AssignmentResponse>>> GetAssignmentsByCourseAsync(int courseId);
+    Task<ServiceResult<AssignmentSubmissionResponse>> SubmitAssignmentAsync(int assignmentId, int studentId, AssignmentSubmissionRequest request, IFormFile? file, CancellationToken cancellationToken);
+    Task<ServiceResult<AssignmentSubmissionResponse>> GetMySubmissionAsync(int assignmentId, int studentId);
+    Task<ServiceResult<IReadOnlyCollection<AssignmentSubmissionResponse>>> GetSubmissionsAsync(int assignmentId);
+    Task<ServiceResult<AssignmentSubmissionResponse>> GradeSubmissionAsync(int submissionId, int instructorId, AssignmentGradeRequest request);
+}
+
 public interface IOrderService
 {
     Task<ServiceResult<IReadOnlyCollection<OrderResponse>>> GetAllAsync();
@@ -147,10 +159,19 @@ public interface ICommentService
     Task<ServiceResult<IReadOnlyCollection<CommentResponse>>> GetAllAsync();
     Task<ServiceResult<CommentResponse>> CreateAsync(CommentCreateRequest request);
     Task<ServiceResult<object>> DeleteAsync(int id);
+    Task<ServiceResult<ReviewResponse>> CreateOrUpdateReviewAsync(int userId, int courseId, ReviewUpsertRequest request);
+    Task<ServiceResult<IReadOnlyCollection<ReviewResponse>>> GetCourseReviewsAsync(int courseId, int? star, string? sortBy);
+    Task<ServiceResult<CourseRatingSummaryResponse>> GetCourseRatingSummaryAsync(int courseId);
+    Task<ServiceResult<ReviewResponse>> ReplyToReviewAsync(int ratingId, ReviewReplyRequest request);
+    Task<ServiceResult<ReviewResponse>> ModerateReviewAsync(int ratingId, ReviewModerationRequest request);
 }
 
 public interface ICertificateService
 {
     Task<ServiceResult<IReadOnlyCollection<CertificateResponse>>> GetAllAsync();
+    Task<ServiceResult<CertificateEligibilityResponse>> CheckEligibilityAsync(int userId, int courseId);
+    Task<ServiceResult<CertificateResponse>> GenerateCertificateAsync(CertificateGenerateRequest request, string verificationBaseUrl);
+    Task<ServiceResult<CertificateVerificationResponse>> VerifyCertificateAsync(string code);
     Task<ServiceResult<CertificateResponse>> CreateAsync(CertificateCreateRequest request);
 }
+

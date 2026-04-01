@@ -5,6 +5,7 @@ using elearn_server.Infrastructure.Persistence;
 using elearn_server.Infrastructure.Persistence.Repositories;
 using elearn_server.Infrastructure.Services;
 using elearn_server.Infrastructure.Services.Core.Auth;
+using elearn_server.Infrastructure.Services.Core.Assignments;
 using elearn_server.Infrastructure.Services.Core.Categories;
 using elearn_server.Infrastructure.Services.Core.Courses;
 using elearn_server.Infrastructure.Services.Core.Progress;
@@ -40,6 +41,7 @@ public static class ServiceExtensions
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
@@ -66,6 +68,7 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IAssignmentService, AssignmentService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IProgressService, ProgressService>();
         services.AddScoped<IQuizService, QuizService>();

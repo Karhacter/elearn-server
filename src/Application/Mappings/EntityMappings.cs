@@ -146,6 +146,7 @@ public static class EntityMappings
         UserId = certificate.UserId,
         CourseId = certificate.CourseId,
         CertificateUrl = certificate.CertificateUrl,
+        VerificationCode = certificate.VerificationCode,
         DateIssued = certificate.DateIssued
     };
 

@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<QuizAttempt> QuizAttempts { get; set; }
     public DbSet<QuizAttemptAnswer> QuizAttemptAnswers { get; set; }
     public DbSet<Assignment> Assignments { get; set; }
+    public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -218,6 +219,15 @@ public class AppDbContext : DbContext
             .WithMany(c => c.Ratings)
             .HasForeignKey(r => r.CourseId);
 
+        modelBuilder.Entity<Rating>()
+            .Property(r => r.Status)
+            .HasConversion<string>()
+            .HasDefaultValue(Domain.Enums.ReviewStatus.Pending);
+
+        modelBuilder.Entity<Rating>()
+            .HasIndex(r => new { r.UserId, r.CourseId })
+            .IsUnique();
+
         // Payment - User (One-to-Many)
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.User)
@@ -249,6 +259,15 @@ public class AppDbContext : DbContext
             .HasOne(c => c.Course)
             .WithMany(c => c.Certificates)
             .HasForeignKey(c => c.CourseId);
+
+        modelBuilder.Entity<Certificate>()
+            .HasIndex(c => new { c.UserId, c.CourseId })
+            .IsUnique();
+
+        modelBuilder.Entity<Certificate>()
+            .HasIndex(c => c.VerificationCode)
+            .IsUnique()
+            .HasFilter("[VerificationCode] IS NOT NULL");
 
         // Quiz - Course (One-to-Many)
         modelBuilder.Entity<Quiz>()
@@ -318,6 +337,27 @@ public class AppDbContext : DbContext
             .WithMany(c => c.Assignments)
             .HasForeignKey(a => a.CourseId);
 
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne(s => s.Assignment)
+            .WithMany(a => a.Submissions)
+            .HasForeignKey(s => s.AssignmentId);
+
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne(s => s.Student)
+            .WithMany()
+            .HasForeignKey(s => s.StudentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne(s => s.GradedByInstructor)
+            .WithMany()
+            .HasForeignKey(s => s.GradedByInstructorId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasIndex(s => new { s.AssignmentId, s.StudentId })
+            .IsUnique();
+
         // Comment - User (One-to-Many)
         modelBuilder.Entity<Comment>()
             .HasOne(c => c.User)
@@ -329,6 +369,17 @@ public class AppDbContext : DbContext
             .HasOne(c => c.Course)
             .WithMany(c => c.Comments)
             .HasForeignKey(c => c.CourseId);
+
+        modelBuilder.Entity<Comment>()
+            .HasOne(c => c.Rating)
+            .WithOne(r => r.Comment)
+            .HasForeignKey<Comment>(c => c.RatingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Comment>()
+            .HasIndex(c => c.RatingId)
+            .IsUnique()
+            .HasFilter("[RatingId] IS NOT NULL");
 
         // Notification - User (One-to-Many)
         modelBuilder.Entity<Notification>()

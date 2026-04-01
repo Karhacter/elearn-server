@@ -155,6 +155,38 @@ public class QuizAttemptAnswerRequest
     public string? TextAnswer { get; set; }
 }
 
+public class AssignmentUpsertRequest
+{
+    [Required]
+    public int CourseId { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string Title { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(2000)]
+    public string Description { get; set; } = string.Empty;
+
+    [Required]
+    public DateTime DueDate { get; set; }
+}
+
+public class AssignmentSubmissionRequest
+{
+    [MaxLength(4000)]
+    public string? TextSubmission { get; set; }
+}
+
+public class AssignmentGradeRequest
+{
+    [Range(0, 100)]
+    public double Grade { get; set; }
+
+    [MaxLength(2000)]
+    public string? InstructorFeedback { get; set; }
+}
+
 public class WishlistCreateRequest
 {
     [Required]
@@ -203,6 +235,28 @@ public class CommentCreateRequest
     public string Content { get; set; } = string.Empty;
 }
 
+public class ReviewUpsertRequest
+{
+    [Range(1, 5)]
+    public int Score { get; set; }
+
+    [MaxLength(500)]
+    public string? Comment { get; set; }
+}
+
+public class ReviewReplyRequest
+{
+    [Required]
+    [MaxLength(1000)]
+    public string ReplyContent { get; set; } = string.Empty;
+}
+
+public class ReviewModerationRequest
+{
+    [Required]
+    public ReviewStatus Status { get; set; }
+}
+
 public class CertificateCreateRequest
 {
     [Required]
@@ -214,6 +268,15 @@ public class CertificateCreateRequest
     [Required]
     [Url]
     public string CertificateUrl { get; set; } = string.Empty;
+}
+
+public class CertificateGenerateRequest
+{
+    [Required]
+    public int UserId { get; set; }
+
+    [Required]
+    public int CourseId { get; set; }
 }
 
 public class OrderDetailUpsertRequest

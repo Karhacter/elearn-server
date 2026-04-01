@@ -25,6 +25,9 @@ namespace elearn_server.Domain.Entities
         [Url(ErrorMessage = "Invalid URL format")]
         public string CertificateUrl { get; set; }
 
+        [MaxLength(64)]
+        public string? VerificationCode { get; set; }
+
         [DataType(DataType.DateTime)]
         public DateTime DateIssued { get; set; } = DateTime.UtcNow;
 

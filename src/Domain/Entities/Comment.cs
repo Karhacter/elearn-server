@@ -21,6 +21,11 @@ namespace elearn_server.Domain.Entities
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
 
+        public int? RatingId { get; set; }
+
+        [ForeignKey("RatingId")]
+        public Rating? Rating { get; set; }
+
         [Required(ErrorMessage = "Comment is required")]
         [StringLength(500, ErrorMessage = "Comment cannot exceed 500 characters")]
         public string Content { get; set; }

@@ -76,7 +76,7 @@ public class AuthService(
             "Login successful.");
     }
 
-    public async Task<ServiceResult<AuthenticatedUserResponse>> RegisterAsync(UserCreateDTO request, string verificationBaseUrl)
+    public async Task<ServiceResult<AuthenticatedUserResponse>> RegisterAsync(RegisterUserDTO request, string verificationBaseUrl)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         if (await authRepository.GetUserByEmailAsync(normalizedEmail) is not null)
@@ -89,7 +89,7 @@ public class AuthService(
             FullName = request.FullName.Trim(),
             Email = normalizedEmail,
             PhoneNumber = request.PhoneNumber.Trim(),
-            Role = request.Role.Trim(),
+            Role = "Student",
             ProfilePicture = string.IsNullOrWhiteSpace(request.ProfilePicture) ? null : request.ProfilePicture.Trim(),
             IsEmailVerified = !_authSecurityOptions.RequireEmailVerification,
             EmailVerifiedAt = _authSecurityOptions.RequireEmailVerification ? null : DateTime.UtcNow,
@@ -394,3 +394,4 @@ public class AuthService(
     private sealed record AccessTokenResult(string Token, DateTime ExpiresAtUtc);
     private sealed record RefreshTokenIssueResult(string RawToken);
 }
+

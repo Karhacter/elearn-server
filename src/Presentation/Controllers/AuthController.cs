@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using elearn_server.Application.Responses;
 using elearn_server.Application.DTOs;
 using elearn_server.Application.Interfaces;
@@ -38,8 +38,10 @@ public class AuthController(IAuthService authService) : ApiControllerBase
         return FromResult(result);
     }
 
+    // update lại register để đăng ký dưới dạng user, không phải admin tạo user
+
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserCreateDTO registerDto) =>
+    public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerDto) =>
         FromResult(await authService.RegisterAsync(registerDto, Request.Scheme + "://" + Request.Host.Value));
 
     [HttpPost("refresh-token")]
@@ -117,3 +119,4 @@ public class AuthController(IAuthService authService) : ApiControllerBase
         Path = "/"
     };
 }
+
