@@ -6,7 +6,7 @@ public static class CorsExtensions
 
     public static IServiceCollection AddFrontendCors(this IServiceCollection services, IConfiguration configuration)
     {
-        var frontendUrl = configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200";
+        var frontendUrl = configuration["App:FrontendBaseUrl"] ?? "http://localhost:4200" ?? "http://localhost:56269";
 
         services.AddCors(options =>
         {

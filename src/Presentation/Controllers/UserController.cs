@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace elearn_server.Presentation.Controllers;
 
 [Route("api/[controller]")]
- [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class UserController(IUserService userService) : ApiControllerBase
 {
     [HttpGet]
@@ -31,4 +31,6 @@ public class UserController(IUserService userService) : ApiControllerBase
     [HttpPost("{id}/upload-image")]
     public async Task<IActionResult> UploadUserImage(int id, IFormFile imageFile, CancellationToken cancellationToken) =>
         FromResult(await userService.UploadImageAsync(id, imageFile, cancellationToken));
+
+    // soft-delete
 }

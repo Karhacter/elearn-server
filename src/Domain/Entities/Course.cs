@@ -51,6 +51,7 @@ public class Course : BaseEntity
 
     public CourseStatus Status { get; set; } = CourseStatus.Draft; // Mặc định là Draft
     public bool IsSequential { get; set; }
+    public bool IsDeleted { get; set; }
     // One - to - Many || Relationships and Constraints
     public ICollection<Enrollment>? Enrollments { get; set; }      // User's course enrollments
     public ICollection<Payment>? Payments { get; set; }      // User's course enrollments

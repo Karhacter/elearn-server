@@ -30,6 +30,7 @@ public class User : BaseEntity
     [MaxLength(100, ErrorMessage = "Invalid URL format for profile picture")]
     public string? ProfilePicture { get; set; }
 
+    public bool IsDeleted { get; set; }
     public bool IsEmailVerified { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }
 

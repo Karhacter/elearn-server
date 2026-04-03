@@ -34,4 +34,6 @@ public class Lesson : BaseEntity
     [Required(ErrorMessage = "Course ID is required")]
     public int CourseId { get; set; }
     public Course? Course { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

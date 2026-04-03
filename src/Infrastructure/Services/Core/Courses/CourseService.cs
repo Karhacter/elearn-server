@@ -168,7 +168,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
             return ServiceResult<ImageUploadResponse>.Fail(StatusCodes.Status400BadRequest, "No image file provided.");
         }
 
-        return await UpdateImageAsync(id, await fileStorageService.SaveImageAsync(imageFile, cancellationToken));
+        return await UpdateImageAsync(id, await fileStorageService.SaveFileAsync(imageFile, "course", cancellationToken));
     }
 
     public async Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> SearchAsync(string? keyword, int? genreId, int? instructorId) =>

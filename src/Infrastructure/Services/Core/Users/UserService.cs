@@ -6,11 +6,14 @@ using elearn_server.Application.Requests;
 using elearn_server.Application.Responses;
 using elearn_server.Domain.Entities;
 using elearn_server.Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace elearn_server.Infrastructure.Services.Core.Users;
 
 public class UserService(IUserRepository repository, IFileStorageService fileStorageService) : IUserService
 {
+    private readonly PasswordHasher<User> _passwordHasher = new();
+
     public async Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetAllAsync() =>
         ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>.Ok((await repository.GetAllAsync()).Select(u => u.ToAuthenticatedUserResponse()).ToList());
 
@@ -34,10 +37,16 @@ public class UserService(IUserRepository repository, IFileStorageService fileSto
             FullName = request.FullName.Trim(),
             Email = request.Email.Trim().ToLowerInvariant(),
             PhoneNumber = request.PhoneNumber.Trim(),
-            Password = request.Password.Trim(),
             Role = request.Role.Trim(),
-            ProfilePicture = request.ProfilePicture
+            ProfilePicture = string.IsNullOrWhiteSpace(request.ProfilePicture) ? null : request.ProfilePicture.Trim(),
+            IsEmailVerified = true,
+            EmailVerifiedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            UpdatedBy = "system"
         };
+
+        user.Password = _passwordHasher.HashPassword(user, request.Password.Trim());
 
         await repository.AddAsync(user);
         await repository.SaveChangesAsync();
@@ -96,6 +105,6 @@ public class UserService(IUserRepository repository, IFileStorageService fileSto
             return ServiceResult<ImageUploadResponse>.Fail(StatusCodes.Status400BadRequest, "No image file provided.");
         }
 
-        return await UpdateImageAsync(id, await fileStorageService.SaveImageAsync(imageFile, cancellationToken));
+        return await UpdateImageAsync(id, await fileStorageService.SaveFileAsync(imageFile, "user", cancellationToken));
     }
 }

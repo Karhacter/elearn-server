@@ -76,6 +76,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Course>()
             .ToTable("Course");
 
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(u => !u.IsDeleted);
+
+        modelBuilder.Entity<Course>()
+            .HasQueryFilter(c => !c.IsDeleted);
+
+        modelBuilder.Entity<Lesson>()
+            .HasQueryFilter(l => !l.IsDeleted);
+
         modelBuilder.Entity<Course>()
             .Property(c => c.Status)
             .HasConversion<string>();

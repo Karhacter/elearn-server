@@ -41,11 +41,23 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     public Task<bool> UserExistsAsync(int userId) => context.Users.AnyAsync(u => u.UserId == userId);
     public Task<bool> CategoryExistsAsync(int categoryId) => context.Categories.AnyAsync(c => c.Id == categoryId);
     public Task AddAsync(Course course) => context.Courses.AddAsync(course).AsTask();
-    public void Remove(Course course) => context.Courses.Remove(course);
+    public void Remove(Course course)
+    {
+        course.IsDeleted = true;
+        course.DeletedAt = DateTime.UtcNow;
+        course.DeletedBy = "Admin";
+        course.UpdatedAt = DateTime.UtcNow;
+    }
     public Task AddSectionAsync(CourseSection section) => context.CourseSections.AddAsync(section).AsTask();
     public void RemoveSection(CourseSection section) => context.CourseSections.Remove(section);
     public Task AddLessonAsync(Lesson lesson) => context.Lessons.AddAsync(lesson).AsTask();
-    public void RemoveLesson(Lesson lesson) => context.Lessons.Remove(lesson);
+    public void RemoveLesson(Lesson lesson)
+    {
+        lesson.IsDeleted = true;
+        lesson.DeletedAt = DateTime.UtcNow;
+        lesson.DeletedBy = "Admin";
+        lesson.UpdatedAt = DateTime.UtcNow;
+    }
     public Task<CourseSection?> GetSectionByIdAsync(int sectionId) =>
         context.CourseSections.Include(s => s.Lessons).SingleOrDefaultAsync(s => s.SectionId == sectionId);
     public Task<Lesson?> GetLessonByIdAsync(int lessonId) =>

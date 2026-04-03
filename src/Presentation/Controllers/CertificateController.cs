@@ -37,7 +37,7 @@ public class CertificateController(ICertificateService certificateService) : Api
         var verificationBaseUrl = $"{Request.Scheme}://{Request.Host}/api/certificate/verify";
         return FromResult(await certificateService.GenerateCertificateAsync(request, verificationBaseUrl));
     }
-
+    
     [HttpGet("verify/{code}")]
     [AllowAnonymous]
     public async Task<IActionResult> VerifyCertificate(string code) =>
