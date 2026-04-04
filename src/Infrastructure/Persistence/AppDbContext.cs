@@ -79,6 +79,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasQueryFilter(u => !u.IsDeleted);
 
+        modelBuilder.Entity<User>()
+            .Property(u => u.Gender)
+            .HasConversion<string>();
+
         modelBuilder.Entity<Course>()
             .HasQueryFilter(c => !c.IsDeleted);
 
@@ -416,7 +420,7 @@ public class AppDbContext : DbContext
             .HasOne(al => al.User)
             .WithMany()
             .HasForeignKey(al => al.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Wishlist - Course (One-to-Many)
         modelBuilder.Entity<Wishlist>()

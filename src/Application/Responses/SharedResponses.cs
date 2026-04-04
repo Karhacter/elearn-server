@@ -8,6 +8,13 @@ public class AuthenticatedUserResponse
     public string PhoneNumber { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public string? ProfilePicture { get; set; }
+    public string? Gender { get; set; }
+    public DateTime? Birthday { get; set; }
+    public string? CountryCode { get; set; }
+    public string? CountryName { get; set; }
+    public string? CityCode { get; set; }
+    public string? CityName { get; set; }
+    public string? Street { get; set; }
 }
 
 public class LoginResponse
@@ -356,4 +363,11 @@ public class CertificateVerificationResponse
 public class ImageUploadResponse
 {
     public string ImageUrl { get; set; } = string.Empty;
+}
+
+public class BulkSoftDeleteResponse
+{
+    public int RequestedCount { get; set; }
+    public int ProcessedCount { get; set; }
+    public int IgnoredCount { get; set; }
 }

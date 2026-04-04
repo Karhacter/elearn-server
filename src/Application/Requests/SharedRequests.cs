@@ -53,7 +53,7 @@ public class CourseUpsertRequest
     public List<string> TargetAudiences { get; set; } = new();
 }
 
-public class UserUpdateRequest
+public class UserUpdateRequest : IValidatableObject
 {
     [Required]
     [MinLength(2)]
@@ -76,12 +76,53 @@ public class UserUpdateRequest
 
     [Url]
     public string? ProfilePicture { get; set; }
+
+    public string? Gender { get; set; }
+
+    public DateTime? Birthday { get; set; }
+
+    [MaxLength(20)]
+    public string? CountryCode { get; set; }
+
+    [MaxLength(100)]
+    public string? CountryName { get; set; }
+
+    [MaxLength(20)]
+    public string? CityCode { get; set; }
+
+    [MaxLength(100)]
+    public string? CityName { get; set; }
+
+    [MaxLength(255)]
+    public string? Street { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Birthday.HasValue && Birthday.Value.Date >= DateTime.UtcNow.Date)
+        {
+            yield return new ValidationResult("Birthday must be in the past.", [nameof(Birthday)]);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Gender) &&
+            Gender is not ("Male" or "Female" or "PreferNotToSay"))
+        {
+            yield return new ValidationResult("Gender must be Male, Female, or PreferNotToSay.", [nameof(Gender)]);
+        }
+    }
 }
 
 public class UpdateImageRequest
 {
     [Required]
     public string ImageUrl { get; set; } = string.Empty;
+}
+
+public class BulkSoftDeleteRequest
+{
+    [Required]
+    public List<int> Ids { get; set; } = new();
+
+    public bool Restore { get; set; }
 }
 
 public class LessonResumePositionRequest

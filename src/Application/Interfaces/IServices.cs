@@ -24,11 +24,14 @@ public interface IAuthService
 
 public interface IUserService
 {
-    Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetAllAsync();
+    Task<ServiceResult<PagedResult<AuthenticatedUserResponse>>> GetAllAsync(int page, int pageSize);
+    Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetDeletedAsync();
     Task<ServiceResult<AuthenticatedUserResponse>> GetByIdAsync(int id);
     Task<ServiceResult<AuthenticatedUserResponse>> CreateAsync(UserCreateDTO request);
     Task<ServiceResult<AuthenticatedUserResponse>> UpdateAsync(int id, UserUpdateRequest request);
     Task<ServiceResult<object>> DeleteAsync(int id);
+    Task<ServiceResult<AuthenticatedUserResponse>> ToggleSoftDeleteAsync(int id);
+    Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteAsync(BulkSoftDeleteRequest request);
     Task<ServiceResult<ImageUploadResponse>> UpdateImageAsync(int id, string imageUrl);
     Task<ServiceResult<ImageUploadResponse>> UploadImageAsync(int id, IFormFile imageFile, CancellationToken cancellationToken);
 }
@@ -44,12 +47,14 @@ public interface ICategoryService
 
 public interface ICourseService
 {
-    Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> GetAllAsync();
+    Task<ServiceResult<PagedResult<CourseResponse>>> GetAllAsync(int page, int pageSize);
     Task<ServiceResult<PagedResult<CourseResponse>>> GetPagedAsync(int pageNumber, int pageSize);
     Task<ServiceResult<CourseResponse>> GetByIdAsync(int id);
     Task<ServiceResult<CourseResponse>> CreateAsync(CourseUpsertRequest request);
     Task<ServiceResult<CourseResponse>> UpdateAsync(int id, CourseUpsertRequest request);
     Task<ServiceResult<object>> DeleteAsync(int id);
+    Task<ServiceResult<CourseResponse>> ToggleSoftDeleteAsync(int id);
+    Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteAsync(BulkSoftDeleteRequest request);
     Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> GetByCategoryIdAsync(int categoryId);
     Task<ServiceResult<ImageUploadResponse>> UpdateImageAsync(int id, string imageUrl);
     Task<ServiceResult<ImageUploadResponse>> UploadImageAsync(int id, IFormFile imageFile, CancellationToken cancellationToken);
@@ -61,9 +66,11 @@ public interface ICourseService
     Task<ServiceResult<SectionResponse>> UpdateSectionAsync(int courseId, int sectionId, SectionUpdateRequest request);
     Task<ServiceResult<object>> DeleteSectionAsync(int courseId, int sectionId);
     Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> ReorderSectionsAsync(int courseId, SectionReorderRequest request);
+    Task<ServiceResult<PagedResult<LessonResponse>>> GetLessonsAsync(int courseId, int sectionId, int page, int pageSize);
     Task<ServiceResult<LessonResponse>> CreateLessonAsync(int courseId, int sectionId, LessonCreateRequest request);
     Task<ServiceResult<LessonResponse>> UpdateLessonAsync(int courseId, int sectionId, int lessonId, LessonUpdateRequest request);
     Task<ServiceResult<object>> DeleteLessonAsync(int courseId, int sectionId, int lessonId);
+    Task<ServiceResult<LessonResponse>> ToggleLessonSoftDeleteAsync(int courseId, int sectionId, int lessonId);
     Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int courseId, int sectionId, LessonReorderRequest request);
 }
 

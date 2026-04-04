@@ -9,6 +9,7 @@ public interface ICourseRepository
     Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize);
     Task<int> CountAsync();
     Task<Course?> GetByIdAsync(int id);
+    Task<Course?> GetByIdIncludingDeletedAsync(int id);
     Task<Course?> GetByIdWithStructureAsync(int id);
     Task<Course?> GetBySlugAsync(string slug);
     Task<List<Course>> GetByCategoryIdAsync(int categoryId);
@@ -24,7 +25,10 @@ public interface ICourseRepository
     void RemoveLesson(Lesson lesson);
     Task<CourseSection?> GetSectionByIdAsync(int sectionId);
     Task<Lesson?> GetLessonByIdAsync(int lessonId);
+    Task<Lesson?> GetLessonByIdIncludingDeletedAsync(int lessonId);
     Task<List<CourseSection>> GetSectionsByCourseIdAsync(int courseId);
+    Task<List<Lesson>> GetLessonsPagedBySectionIdAsync(int sectionId, int page, int pageSize);
+    Task<int> CountLessonsBySectionIdAsync(int sectionId);
     Task<List<Lesson>> GetLessonsBySectionIdAsync(int sectionId);
     Task SaveChangesAsync();
     IQueryable<Course> RecommendationQuery();

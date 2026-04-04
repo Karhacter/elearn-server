@@ -11,8 +11,22 @@ namespace elearn_server.Infrastructure.Services.Core.Courses;
 
 public class CourseService(ICourseRepository repository, IFileStorageService fileStorageService) : ICourseService
 {
-    public async Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> GetAllAsync() =>
-        ServiceResult<IReadOnlyCollection<CourseResponse>>.Ok((await repository.GetAllAsync()).Select(c => c.ToResponse()).ToList());
+    public async Task<ServiceResult<PagedResult<CourseResponse>>> GetAllAsync(int page, int pageSize)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Max(1, pageSize);
+
+        var items = await repository.GetPagedAsync(page, pageSize);
+        var total = await repository.CountAsync();
+
+        return ServiceResult<PagedResult<CourseResponse>>.Ok(new PagedResult<CourseResponse>
+        {
+            Items = items.Select(c => c.ToResponse()).ToList(),
+            TotalCount = total,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
 
     public async Task<ServiceResult<PagedResult<CourseResponse>>> GetPagedAsync(int pageNumber, int pageSize)
     {
@@ -138,6 +152,90 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         repository.Remove(course);
         await repository.SaveChangesAsync();
         return ServiceResult<object>.Ok(null, "Course deleted successfully.");
+    }
+
+    public async Task<ServiceResult<CourseResponse>> ToggleSoftDeleteAsync(int id)
+    {
+        var course = await repository.GetByIdIncludingDeletedAsync(id);
+        if (course is null)
+        {
+            return ServiceResult<CourseResponse>.Fail(StatusCodes.Status404NotFound, "Course not found.");
+        }
+
+        if (course.IsDeleted)
+        {
+            course.IsDeleted = false;
+            course.DeletedAt = null;
+            course.DeletedBy = null;
+        }
+        else
+        {
+            course.IsDeleted = true;
+            course.DeletedAt = DateTime.UtcNow;
+            course.DeletedBy = "Admin";
+        }
+
+        course.UpdatedAt = DateTime.UtcNow;
+        await repository.SaveChangesAsync();
+        return ServiceResult<CourseResponse>.Ok(
+            course.ToResponse(),
+            course.IsDeleted ? "Course soft deleted successfully." : "Course restored successfully.");
+    }
+
+    public async Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteAsync(BulkSoftDeleteRequest request)
+    {
+        var ids = request.Ids
+            .Where(id => id > 0)
+            .Distinct()
+            .ToList();
+
+        var processedCount = 0;
+        foreach (var id in ids)
+        {
+            var course = await repository.GetByIdIncludingDeletedAsync(id);
+            if (course is null)
+            {
+                continue;
+            }
+
+            if (request.Restore)
+            {
+                if (!course.IsDeleted)
+                {
+                    continue;
+                }
+
+                course.IsDeleted = false;
+                course.DeletedAt = null;
+                course.DeletedBy = null;
+            }
+            else
+            {
+                if (course.IsDeleted)
+                {
+                    continue;
+                }
+
+                course.IsDeleted = true;
+                course.DeletedAt = DateTime.UtcNow;
+                course.DeletedBy = "Admin";
+            }
+
+            course.UpdatedAt = DateTime.UtcNow;
+            processedCount++;
+        }
+
+        if (processedCount > 0)
+        {
+            await repository.SaveChangesAsync();
+        }
+
+        return ServiceResult<BulkSoftDeleteResponse>.Ok(new BulkSoftDeleteResponse
+        {
+            RequestedCount = ids.Count,
+            ProcessedCount = processedCount,
+            IgnoredCount = ids.Count - processedCount
+        }, request.Restore ? "Courses restored successfully." : "Courses soft deleted successfully.");
     }
 
     public async Task<ServiceResult<IReadOnlyCollection<CourseResponse>>> GetByCategoryIdAsync(int categoryId)
@@ -301,6 +399,29 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<IReadOnlyCollection<SectionResponse>>.Ok(updated.OrderBy(s => s.Order).Select(s => s.ToResponse()).ToList());
     }
 
+    public async Task<ServiceResult<PagedResult<LessonResponse>>> GetLessonsAsync(int courseId, int sectionId, int page, int pageSize)
+    {
+        var section = await repository.GetSectionByIdAsync(sectionId);
+        if (section is null || section.CourseId != courseId)
+        {
+            return ServiceResult<PagedResult<LessonResponse>>.Fail(StatusCodes.Status404NotFound, "Section not found.");
+        }
+
+        page = Math.Max(1, page);
+        pageSize = Math.Max(1, pageSize);
+
+        var lessons = await repository.GetLessonsPagedBySectionIdAsync(sectionId, page, pageSize);
+        var totalCount = await repository.CountLessonsBySectionIdAsync(sectionId);
+
+        return ServiceResult<PagedResult<LessonResponse>>.Ok(new PagedResult<LessonResponse>
+        {
+            Items = lessons.Select(l => l.ToResponse()).ToList(),
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+
     public async Task<ServiceResult<LessonResponse>> CreateLessonAsync(int courseId, int sectionId, LessonCreateRequest request)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
@@ -380,6 +501,34 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         await repository.SaveChangesAsync();
         await NormalizeLessonOrderAsync(sectionId);
         return ServiceResult<object>.Ok(null, "Lesson deleted successfully.");
+    }
+
+    public async Task<ServiceResult<LessonResponse>> ToggleLessonSoftDeleteAsync(int courseId, int sectionId, int lessonId)
+    {
+        var lesson = await repository.GetLessonByIdIncludingDeletedAsync(lessonId);
+        if (lesson is null || lesson.CourseId != courseId || lesson.SectionId != sectionId)
+        {
+            return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
+        }
+
+        if (lesson.IsDeleted)
+        {
+            lesson.IsDeleted = false;
+            lesson.DeletedAt = null;
+            lesson.DeletedBy = null;
+        }
+        else
+        {
+            lesson.IsDeleted = true;
+            lesson.DeletedAt = DateTime.UtcNow;
+            lesson.DeletedBy = "Admin";
+        }
+
+        lesson.UpdatedAt = DateTime.UtcNow;
+        await repository.SaveChangesAsync();
+        return ServiceResult<LessonResponse>.Ok(
+            lesson.ToResponse(),
+            lesson.IsDeleted ? "Lesson soft deleted successfully." : "Lesson restored successfully.");
     }
 
     public async Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int courseId, int sectionId, LessonReorderRequest request)

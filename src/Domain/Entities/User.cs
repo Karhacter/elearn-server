@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Domain.Entities;
 
@@ -30,18 +31,35 @@ public class User : BaseEntity
     [MaxLength(100, ErrorMessage = "Invalid URL format for profile picture")]
     public string? ProfilePicture { get; set; }
 
+    public GenderType? Gender { get; set; }
+
+    public DateTime? Birthday { get; set; }
+
+    [MaxLength(20, ErrorMessage = "Country code cannot exceed 20 characters")]
+    public string? CountryCode { get; set; }
+
+    [MaxLength(100, ErrorMessage = "Country name cannot exceed 100 characters")]
+    public string? CountryName { get; set; }
+
+    [MaxLength(20, ErrorMessage = "City code cannot exceed 20 characters")]
+    public string? CityCode { get; set; }
+
+    [MaxLength(100, ErrorMessage = "City name cannot exceed 100 characters")]
+    public string? CityName { get; set; }
+
+    [MaxLength(255, ErrorMessage = "Street cannot exceed 255 characters")]
+    public string? Street { get; set; }
+
     public bool IsDeleted { get; set; }
     public bool IsEmailVerified { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }
 
-    // Relationships and Constraints
-    public ICollection<Enrollment>? Enrollments { get; set; }      // User's course enrollments
-    public ICollection<Payment>? Payments { get; set; }            // User's payment history
-    public ICollection<Wishlist>? Wishlists { get; set; }          // Courses the user has added to wishlist
+    public ICollection<Enrollment>? Enrollments { get; set; }
+    public ICollection<Payment>? Payments { get; set; }
+    public ICollection<Wishlist>? Wishlists { get; set; }
     public ICollection<Certificate>? Certificates { get; set; }
     public ICollection<Comment>? Comments { get; set; }
     public ICollection<Rating>? Ratings { get; set; }
     public ICollection<Notification>? Notifications { get; set; }
     public ICollection<RefreshToken>? RefreshTokens { get; set; }
-
 }

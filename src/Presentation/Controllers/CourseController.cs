@@ -10,7 +10,8 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAllCourses() => FromResult(await courseService.GetAllAsync());
+    public async Task<IActionResult> GetAllCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        FromResult(await courseService.GetAllAsync(page, pageSize));
 
     [HttpGet("paged")]
     [AllowAnonymous]
@@ -31,6 +32,15 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCourse(int id) => FromResult(await courseService.DeleteAsync(id));
+
+    [HttpPatch("{id}/toggle-soft-delete")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ToggleSoftDelete(int id) => FromResult(await courseService.ToggleSoftDeleteAsync(id));
+
+    [HttpPost("bulk-soft-delete")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BulkSoftDelete([FromBody] BulkSoftDeleteRequest request) =>
+        FromResult(await courseService.BulkSoftDeleteAsync(request));
 
     [HttpGet("category/{categoryId}")]
     [AllowAnonymous]
@@ -97,6 +107,11 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
         FromResult(await courseService.ReorderSectionsAsync(courseId, request));
 
     // Create Lesssons within a section
+    [HttpGet("{courseId}/sections/{sectionId}/lessons")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetLessons(int courseId, int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        FromResult(await courseService.GetLessonsAsync(courseId, sectionId, page, pageSize));
+
     [HttpPost("{courseId}/sections/{sectionId}/lessons")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> CreateLesson(int courseId, int sectionId, [FromBody] LessonCreateRequest request) =>
@@ -115,6 +130,11 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> DeleteLesson(int courseId, int sectionId, int lessonId) =>
         FromResult(await courseService.DeleteLessonAsync(courseId, sectionId, lessonId));
+
+    [HttpPatch("{courseId}/sections/{sectionId}/lessons/{lessonId}/toggle-soft-delete")]
+    [Authorize(Roles = "Admin,Instructor")]
+    public async Task<IActionResult> ToggleLessonSoftDelete(int courseId, int sectionId, int lessonId) =>
+        FromResult(await courseService.ToggleLessonSoftDeleteAsync(courseId, sectionId, lessonId));
 
     // Reorder lessons within a section
     [HttpPost("{courseId}/sections/{sectionId}/lessons/reorder")]

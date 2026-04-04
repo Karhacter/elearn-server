@@ -13,9 +13,9 @@ using Microsoft.Extensions.Options;
 using elearn_server.Application.Interfaces;
 using elearn_server.Domain.Interfaces;
 using elearn_server.Common.Options;
+using elearn_server.Domain.Enums;
 
 namespace elearn_server.Infrastructure.Services.Core.Auth;
-
 
 public class AuthService(
     IAuthRepository authRepository,
@@ -91,6 +91,13 @@ public class AuthService(
             PhoneNumber = request.PhoneNumber.Trim(),
             Role = "Student",
             ProfilePicture = string.IsNullOrWhiteSpace(request.ProfilePicture) ? null : request.ProfilePicture.Trim(),
+            Gender = ParseGender(request.Gender),
+            Birthday = request.Birthday,
+            CountryCode = string.IsNullOrWhiteSpace(request.CountryCode) ? null : request.CountryCode.Trim(),
+            CountryName = string.IsNullOrWhiteSpace(request.CountryName) ? null : request.CountryName.Trim(),
+            CityCode = string.IsNullOrWhiteSpace(request.CityCode) ? null : request.CityCode.Trim(),
+            CityName = string.IsNullOrWhiteSpace(request.CityName) ? null : request.CityName.Trim(),
+            Street = string.IsNullOrWhiteSpace(request.Street) ? null : request.Street.Trim(),
             IsEmailVerified = !_authSecurityOptions.RequireEmailVerification,
             EmailVerifiedAt = _authSecurityOptions.RequireEmailVerification ? null : DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
@@ -391,7 +398,13 @@ public class AuthService(
         return Convert.ToHexString(bytes);
     }
 
+    private static GenderType? ParseGender(string? gender) =>
+        string.IsNullOrWhiteSpace(gender)
+            ? null
+            : Enum.TryParse<GenderType>(gender.Trim(), true, out var parsedGender)
+                ? parsedGender
+                : null;
+
     private sealed record AccessTokenResult(string Token, DateTime ExpiresAtUtc);
     private sealed record RefreshTokenIssueResult(string RawToken);
 }
-

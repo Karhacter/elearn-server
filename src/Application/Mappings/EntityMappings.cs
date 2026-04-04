@@ -1,4 +1,4 @@
-﻿
+
 using elearn_server.Application.Responses;
 using elearn_server.Domain.Entities;
 
@@ -13,7 +13,14 @@ public static class EntityMappings
         Email = user.Email,
         PhoneNumber = user.PhoneNumber,
         Role = user.Role,
-        ProfilePicture = user.ProfilePicture
+        ProfilePicture = user.ProfilePicture,
+        Gender = user.Gender?.ToString(),
+        Birthday = user.Birthday,
+        CountryCode = user.CountryCode,
+        CountryName = user.CountryName,
+        CityCode = user.CityCode,
+        CityName = user.CityName,
+        Street = user.Street
     };
 
     public static CategoryResponse ToResponse(this Category category) => new()
@@ -149,5 +156,4 @@ public static class EntityMappings
         VerificationCode = certificate.VerificationCode,
         DateIssued = certificate.DateIssued
     };
-
 }

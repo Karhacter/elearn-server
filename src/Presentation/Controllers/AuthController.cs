@@ -56,17 +56,22 @@ public class AuthController(IAuthService authService) : ApiControllerBase
         return FromResult(result);
     }
 
+    // Xác thực email
     [HttpPost("verify-email")]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequestDTO request) => FromResult(await authService.VerifyEmailAsync(request));
+
 
     [HttpPost("forgot-password")]
     [EnableRateLimiting("auth-forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO requestDto) => FromResult(await authService.ForgotPasswordAsync(requestDto));
 
+
+    // quen mat khau
     [HttpPost("reset-password")]
     [EnableRateLimiting("auth-reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO requestDto) => FromResult(await authService.ResetPasswordAsync(requestDto));
 
+    // change password 
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO requestDto)
