@@ -1,7 +1,7 @@
-﻿using elearn_server.Infrastructure.Persistence;
+﻿
 using elearn_server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using elearn_server.Domain.Interfaces;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
 namespace elearn_server.Infrastructure.Persistence.Repositories;
 

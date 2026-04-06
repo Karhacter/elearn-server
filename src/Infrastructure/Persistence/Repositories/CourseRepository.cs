@@ -1,7 +1,8 @@
-﻿using elearn_server.Infrastructure.Persistence;
+using elearn_server.Infrastructure.Persistence;
 using elearn_server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using elearn_server.Domain.Interfaces;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
 namespace elearn_server.Infrastructure.Persistence.Repositories;
 
@@ -20,7 +21,13 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         .Include(c => c.Requirements)
         .Include(c => c.TargetAudiences);
     public Task<List<Course>> GetAllAsync() => BaseQuery().AsNoTracking().ToListAsync();
+
     public Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize) => BaseQuery().AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+    // Get Deleted Courses
+    public Task<List<Course>> GetDeletedAsync(int pageNumber, int pageSize) => BaseQuery().IgnoreQueryFilters().AsNoTracking().Where(c => c.IsDeleted).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+
     public Task<int> CountAsync() => context.Courses.CountAsync();
     public Task<Course?> GetByIdAsync(int id) => BaseQuery().SingleOrDefaultAsync(c => c.CourseId == id);
     public Task<Course?> GetByIdIncludingDeletedAsync(int id) => context.Courses
@@ -57,7 +64,13 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         course.UpdatedAt = DateTime.UtcNow;
     }
     public Task AddSectionAsync(CourseSection section) => context.CourseSections.AddAsync(section).AsTask();
-    public void RemoveSection(CourseSection section) => context.CourseSections.Remove(section);
+    public void RemoveSection(CourseSection section)
+    {
+        section.IsDeleted = true;
+        section.DeletedAt = DateTime.UtcNow;
+        section.DeletedBy = "Admin";
+        section.UpdatedAt = DateTime.UtcNow;
+    }
     public Task AddLessonAsync(Lesson lesson) => context.Lessons.AddAsync(lesson).AsTask();
     public void RemoveLesson(Lesson lesson)
     {
@@ -68,12 +81,19 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     }
     public Task<CourseSection?> GetSectionByIdAsync(int sectionId) =>
         context.CourseSections.Include(s => s.Lessons).SingleOrDefaultAsync(s => s.SectionId == sectionId);
+
+    public Task<CourseSection?> GetSectionByIdIncludingDeletedAsync(int sectionId) =>
+        context.CourseSections.IgnoreQueryFilters().Include(s => s.Lessons).SingleOrDefaultAsync(s => s.SectionId == sectionId);
+
     public Task<Lesson?> GetLessonByIdAsync(int lessonId) =>
         context.Lessons.SingleOrDefaultAsync(l => l.LessonId == lessonId);
+
     public Task<Lesson?> GetLessonByIdIncludingDeletedAsync(int lessonId) =>
         context.Lessons.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.LessonId == lessonId);
+
     public Task<List<CourseSection>> GetSectionsByCourseIdAsync(int courseId) =>
         context.CourseSections.Include(s => s.Lessons).Where(s => s.CourseId == courseId).ToListAsync();
+
     public Task<List<Lesson>> GetLessonsPagedBySectionIdAsync(int sectionId, int page, int pageSize) =>
         context.Lessons.Where(l => l.SectionId == sectionId)
             .OrderBy(l => l.Order)

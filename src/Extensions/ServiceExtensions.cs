@@ -16,6 +16,7 @@ using elearn_server.Infrastructure.Services.Commerce;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
 namespace elearn_server.Extensions;
 

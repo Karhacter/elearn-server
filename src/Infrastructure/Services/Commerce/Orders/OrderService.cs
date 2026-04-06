@@ -3,7 +3,7 @@ using elearn_server.Application.Responses;
 using elearn_server.Application.DTOs;
 using elearn_server.Application.Mappings;
 using elearn_server.Domain.Entities;
-using elearn_server.Infrastructure.Persistence.Repositories;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 using elearn_server.Application.Common;
 using elearn_server.Domain.Enums;
 

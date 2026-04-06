@@ -1,6 +1,6 @@
 ﻿using elearn_server.Domain.Entities;
 
-namespace elearn_server.Infrastructure.Persistence.Repositories;
+namespace elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
 public interface IEnrollmentRepository
 {

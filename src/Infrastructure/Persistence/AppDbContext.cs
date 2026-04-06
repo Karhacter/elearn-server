@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
+
     public DbSet<User> Users { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
@@ -36,9 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<CourseProgress> CourseProgresses { get; set; }
     public DbSet<LessonProgress> LessonProgresses { get; set; }
     public DbSet<LessonCompletion> LessonCompletions { get; set; }
-
     public DbSet<Cart> Carts { get; set; }
-
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
@@ -55,51 +54,38 @@ public class AppDbContext : DbContext
 
         var sensitiveEntities = new[] { typeof(User), typeof(Course) };
 
-
-
-        // Loop through all entities and foreign keys
+        // Loop through all entities and foreign keys to set default delete behavior
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
+            // Exempt dependent entities that should be deleted when severed from Course
+            var isDependentEntity = entity.ClrType == typeof(LearningOutcome) || 
+                                   entity.ClrType == typeof(CourseRequirement) || 
+                                   entity.ClrType == typeof(CourseTargetAudience);
+
             foreach (var foreignKey in entity.GetForeignKeys())
             {
-                // If the foreign key references a sensitive entity, set to NoAction
-                if (sensitiveEntities.Contains(foreignKey.PrincipalEntityType.ClrType))
+                // If the foreign key references a sensitive entity AND is not a dependent entity, set to NoAction
+                if (sensitiveEntities.Contains(foreignKey.PrincipalEntityType.ClrType) && !isDependentEntity)
                 {
                     foreignKey.DeleteBehavior = DeleteBehavior.NoAction;
                 }
             }
         }
 
-
-
         // Relationships and Constraints
-        modelBuilder.Entity<Course>()
-            .ToTable("Course");
+        modelBuilder.Entity<Course>().ToTable("Course");
 
-        modelBuilder.Entity<User>()
-            .HasQueryFilter(u => !u.IsDeleted);
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+        modelBuilder.Entity<User>().Property(u => u.Gender).HasConversion<string>();
 
-        modelBuilder.Entity<User>()
-            .Property(u => u.Gender)
-            .HasConversion<string>();
+        modelBuilder.Entity<Course>().HasQueryFilter(c => !c.IsDeleted);
+        modelBuilder.Entity<CourseSection>().HasQueryFilter(s => !s.IsDeleted);
+        modelBuilder.Entity<Lesson>().HasQueryFilter(l => !l.IsDeleted);
 
-        modelBuilder.Entity<Course>()
-            .HasQueryFilter(c => !c.IsDeleted);
+        modelBuilder.Entity<Course>().Property(c => c.Status).HasConversion<string>();
+        modelBuilder.Entity<Course>().HasIndex(c => c.Slug).IsUnique();
 
-        modelBuilder.Entity<Lesson>()
-            .HasQueryFilter(l => !l.IsDeleted);
-
-        modelBuilder.Entity<Course>()
-            .Property(c => c.Status)
-            .HasConversion<string>();
-
-        modelBuilder.Entity<Course>()
-            .HasIndex(c => c.Slug)
-            .IsUnique();
-
-        modelBuilder.Entity<Lesson>()
-            .Property(l => l.Type)
-            .HasConversion<string>();
+        modelBuilder.Entity<Lesson>().Property(l => l.Type).HasConversion<string>();
 
         // User - Enrollment (One-to-Many)
         modelBuilder.Entity<Enrollment>()
@@ -219,7 +205,6 @@ public class AppDbContext : DbContext
             .HasForeignKey(lc => lc.LessonId)
             .OnDelete(DeleteBehavior.NoAction);
 
-
         // User - Rating (One-to-Many)
         modelBuilder.Entity<Rating>()
             .HasOne(r => r.User)
@@ -248,8 +233,8 @@ public class AppDbContext : DbContext
             .HasForeignKey(p => p.UserId);
 
         modelBuilder.Entity<Order>()
-                    .Property(o => o.Status)
-                    .HasConversion<string>(); // "Pending", "Completed"...
+            .Property(o => o.Status)
+            .HasConversion<string>();
 
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status)
@@ -428,12 +413,12 @@ public class AppDbContext : DbContext
             .WithMany(c => c.Wishlists)
             .HasForeignKey(w => w.CourseId);
 
-        // Email của User là duy nhất
+        // Email of User is unique
         modelBuilder.Entity<User>()
-        .HasIndex(u => u.Email)
-        .IsUnique();
+            .HasIndex(u => u.Email)
+            .IsUnique();
 
-        // Một User chỉ được Enrollment (ghi danh) vào một Course MỘT LẦN DUY NHẤT
+        // A User can only enroll in a Course ONCE
         modelBuilder.Entity<Enrollment>()
             .HasIndex(e => new { e.UserId, e.CourseId })
             .IsUnique();
@@ -444,9 +429,5 @@ public class AppDbContext : DbContext
             new Role { Id = 2, RoleName = "Instructor" },
             new Role { Id = 3, RoleName = "Student" }
         );
-
-
     }
 }
-
-

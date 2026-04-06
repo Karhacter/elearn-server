@@ -1,12 +1,12 @@
 using System.Text.RegularExpressions;
 using elearn_server.Application.Common;
-using elearn_server.Application.Interfaces;
 using elearn_server.Application.Mappings;
 using elearn_server.Application.Requests;
 using elearn_server.Application.Responses;
 using elearn_server.Domain.Entities;
 using elearn_server.Domain.Enums;
-using elearn_server.Infrastructure.Persistence.Repositories;
+using elearn_server.Application.Interfaces;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 namespace elearn_server.Infrastructure.Services.Core.Courses;
 
 public class CourseService(ICourseRepository repository, IFileStorageService fileStorageService) : ICourseService
@@ -43,6 +43,21 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         });
     }
 
+    public async Task<ServiceResult<PagedResult<CourseResponse>>> GetDeletedAsync(int page, int pageSize)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Max(1, pageSize);
+        var items = await repository.GetDeletedAsync(page, pageSize);
+        var total = await repository.CountAsync();
+        return ServiceResult<PagedResult<CourseResponse>>.Ok(new PagedResult<CourseResponse>
+        {
+            Items = items.Select(c => c.ToResponse()).ToList(),
+            TotalCount = total,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+
     public async Task<ServiceResult<CourseResponse>> GetByIdAsync(int id)
     {
         var course = await repository.GetByIdAsync(id);
@@ -51,7 +66,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
             : ServiceResult<CourseResponse>.Ok(course.ToResponse());
     }
 
-    public async Task<ServiceResult<CourseResponse>> CreateAsync(CourseUpsertRequest request)
+    public async Task<ServiceResult<CourseResponse>> CreateAsync(CourseCreateRequest request)
     {
         if (await repository.GetByTitleAsync(request.Title.Trim()) is not null)
         {
@@ -80,7 +95,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
             InstructorId = request.InstructorId,
             Slug = slug,
             IsSequential = request.IsSequential,
-            Status = CourseStatus.Draft,
+            Status = request.Status,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             UpdatedBy = "system"
@@ -96,7 +111,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<CourseResponse>.Created(created!.ToResponse(), "Course created successfully.");
     }
 
-    public async Task<ServiceResult<CourseResponse>> UpdateAsync(int id, CourseUpsertRequest request)
+    public async Task<ServiceResult<CourseResponse>> UpdateAsync(int id, CourseCreateRequest request)
     {
         var course = await repository.GetByIdWithStructureAsync(id);
         if (course is null)
@@ -113,6 +128,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         course.GenreId = request.GenreId;
         course.InstructorId = request.InstructorId;
         course.Image = request.Image;
+        course.Status = request.Status;
         course.Slug = await ResolveSlugAsync(course.Slug, request.Slug, request.Title, id);
         course.IsSequential = request.IsSequential;
         course.UpdatedAt = DateTime.UtcNow;
@@ -310,6 +326,12 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<CourseResponse>.Ok(updated!.ToResponse(), "Course moved to draft.");
     }
 
+    public async Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> GetSectionsAsync(int courseId)
+    {
+        var sections = await repository.GetSectionsByCourseIdAsync(courseId);
+        return ServiceResult<IReadOnlyCollection<SectionResponse>>.Ok(sections.Select(s => s.ToResponse()).ToList());
+    }
+
     public async Task<ServiceResult<SectionResponse>> CreateSectionAsync(int courseId, SectionCreateRequest request)
     {
         var course = await repository.GetByIdAsync(courseId);
@@ -372,7 +394,38 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         repository.RemoveSection(section);
         await repository.SaveChangesAsync();
         await NormalizeSectionOrderAsync(courseId);
-        return ServiceResult<object>.Ok(null, "Section deleted successfully.");
+        return ServiceResult<object>.Ok(null, "Section soft deleted successfully.");
+    }
+
+    public async Task<ServiceResult<SectionResponse>> ToggleSectionSoftDeleteAsync(int courseId, int sectionId)
+    {
+        var section = await repository.GetSectionByIdIncludingDeletedAsync(sectionId);
+        if (section is null || section.CourseId != courseId)
+        {
+            return ServiceResult<SectionResponse>.Fail(StatusCodes.Status404NotFound, "Section not found.");
+        }
+
+        if (section.IsDeleted)
+        {
+            section.IsDeleted = false;
+            section.DeletedAt = null;
+            section.DeletedBy = null;
+        }
+        else
+        {
+            section.IsDeleted = true;
+            section.DeletedAt = DateTime.UtcNow;
+            section.DeletedBy = "Admin";
+        }
+
+        section.UpdatedAt = DateTime.UtcNow;
+        await repository.SaveChangesAsync();
+        await NormalizeSectionOrderAsync(courseId);
+
+        var updated = await repository.GetSectionByIdIncludingDeletedAsync(sectionId);
+        return ServiceResult<SectionResponse>.Ok(
+            updated!.ToResponse(),
+            section.IsDeleted ? "Section soft deleted successfully." : "Section restored successfully.");
     }
 
     public async Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> ReorderSectionsAsync(int courseId, SectionReorderRequest request)

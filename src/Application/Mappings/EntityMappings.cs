@@ -49,7 +49,8 @@ public static class EntityMappings
         InstructorName = course.Instructor?.FullName,
         LearningOutcomes = course.LearningOutcomes?.OrderBy(o => o.Order).Select(o => o.Content).ToList() ?? new List<string>(),
         Requirements = course.Requirements?.OrderBy(r => r.Order).Select(r => r.Content).ToList() ?? new List<string>(),
-        TargetAudiences = course.TargetAudiences?.OrderBy(t => t.Order).Select(t => t.Content).ToList() ?? new List<string>()
+        TargetAudiences = course.TargetAudiences?.OrderBy(t => t.Order).Select(t => t.Content).ToList() ?? new List<string>(),
+        IsDeleted = course.IsDeleted
     };
 
     public static SectionResponse ToResponse(this CourseSection section) => new()
@@ -58,6 +59,7 @@ public static class EntityMappings
         Title = section.Title,
         Description = section.Description,
         Order = section.Order,
+        IsDeleted = section.IsDeleted,
         Lessons = section.Lessons?.OrderBy(l => l.Order).Select(ToResponse).ToList() ?? new List<LessonResponse>()
     };
 
@@ -69,7 +71,8 @@ public static class EntityMappings
         Type = lesson.Type.ToString(),
         Duration = lesson.Duration,
         Order = lesson.Order,
-        SectionId = lesson.SectionId
+        SectionId = lesson.SectionId,
+        IsDeleted = lesson.IsDeleted
     };
 
     public static CoursePreviewResponse ToPreviewResponse(this Course course) => new()

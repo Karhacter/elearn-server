@@ -27,6 +27,7 @@ public class CourseResponse
     public IReadOnlyCollection<string> LearningOutcomes { get; set; } = Array.Empty<string>();
     public IReadOnlyCollection<string> Requirements { get; set; } = Array.Empty<string>();
     public IReadOnlyCollection<string> TargetAudiences { get; set; } = Array.Empty<string>();
+    public bool IsDeleted { get; set; }
 }
 
 public class SectionResponse
@@ -35,6 +36,7 @@ public class SectionResponse
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int Order { get; set; }
+    public bool IsDeleted { get; set; }
     public IReadOnlyCollection<LessonResponse> Lessons { get; set; } = Array.Empty<LessonResponse>();
 }
 
@@ -47,6 +49,7 @@ public class LessonResponse
     public int Duration { get; set; }
     public int Order { get; set; }
     public int SectionId { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public class CoursePreviewResponse

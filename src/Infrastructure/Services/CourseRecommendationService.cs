@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using elearn_server.Application.DTOs;
 using elearn_server.Domain.Entities;
-using elearn_server.Infrastructure.Persistence.Repositories;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 using elearn_server.Application.Requests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

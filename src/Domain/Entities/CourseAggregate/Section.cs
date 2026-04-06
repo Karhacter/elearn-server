@@ -25,4 +25,6 @@ public class CourseSection : BaseEntity
     public Course? Course { get; set; }
 
     public ICollection<Lesson>? Lessons { get; set; }
+
+    public bool IsDeleted { get; set; } 
 }

@@ -13,9 +13,10 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> GetAllCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         FromResult(await courseService.GetAllAsync(page, pageSize));
 
-    [HttpGet("paged")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetPagedCourses(int pageNumber = 1, int pageSize = 10) => FromResult(await courseService.GetPagedAsync(pageNumber, pageSize));
+    // get Deleted Course
+    [HttpGet("deleted")]
+    public async Task<IActionResult> GetDeletedCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) => FromResult(await courseService.GetDeletedAsync(page, pageSize));
+
 
     [HttpGet("detail/{id}")]
     [AllowAnonymous]
@@ -23,11 +24,11 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
 
     [HttpPost("add")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> CreateCourse([FromBody] CourseUpsertRequest request) => FromResult(await courseService.CreateAsync(request));
+    public async Task<IActionResult> CreateCourse([FromBody] CourseCreateRequest request) => FromResult(await courseService.CreateAsync(request));
 
     [HttpPut("edit/{id}")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> UpdateCourse(int id, [FromBody] CourseUpsertRequest request) => FromResult(await courseService.UpdateAsync(id, request));
+    public async Task<IActionResult> UpdateCourse(int id, [FromBody] CourseCreateRequest request) => FromResult(await courseService.UpdateAsync(id, request));
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
@@ -45,6 +46,8 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     [HttpGet("category/{categoryId}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetCoursesByCategoryId(int categoryId) => FromResult(await courseService.GetByCategoryIdAsync(categoryId));
+
+
 
     [HttpPatch("{id}/image")]
     [Authorize(Roles = "Admin,Instructor")]
@@ -68,77 +71,19 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
 
 
     // Publish and unpublish courses (only admins can publish, instructors can only unpublish their own courses)
+    // Giảng viên gửi lên / admin duyệt 
     [HttpPost("{id}/publish")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> PublishCourse(int id) =>
         FromResult(await courseService.PublishAsync(id, User.IsInRole("Admin")));
 
+    // Từ chối
     [HttpPost("{id}/unpublish")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> UnpublishCourse(int id) =>
         FromResult(await courseService.UnpublishAsync(id));
 
-    //
-
 
     // Add, update, and delete sections and lessons within a course
-    [HttpPost("{courseId}/sections")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> CreateSection(int courseId, [FromBody] SectionCreateRequest request) =>
-        FromResult(await courseService.CreateSectionAsync(courseId, request));
-
-
-    // Update and delete sections and lessons, and reorder sections and lessons within a course
-    [HttpPut("{courseId}/sections/{sectionId}")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> UpdateSection(int courseId, int sectionId, [FromBody] SectionUpdateRequest request) =>
-        FromResult(await courseService.UpdateSectionAsync(courseId, sectionId, request));
-
-    [HttpDelete("{courseId}/sections/{sectionId}")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> DeleteSection(int courseId, int sectionId) =>
-        FromResult(await courseService.DeleteSectionAsync(courseId, sectionId));
-
-
-    // Reorder sections within a course
-    [HttpPost("{courseId}/sections/reorder")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> ReorderSections(int courseId, [FromBody] SectionReorderRequest request) =>
-        FromResult(await courseService.ReorderSectionsAsync(courseId, request));
-
-    // Create Lesssons within a section
-    [HttpGet("{courseId}/sections/{sectionId}/lessons")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetLessons(int courseId, int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
-        FromResult(await courseService.GetLessonsAsync(courseId, sectionId, page, pageSize));
-
-    [HttpPost("{courseId}/sections/{sectionId}/lessons")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> CreateLesson(int courseId, int sectionId, [FromBody] LessonCreateRequest request) =>
-        FromResult(await courseService.CreateLessonAsync(courseId, sectionId, request));
-
-
-    // Update  lessons
-    [HttpPut("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> UpdateLesson(int courseId, int sectionId, int lessonId, [FromBody] LessonUpdateRequest request) =>
-        FromResult(await courseService.UpdateLessonAsync(courseId, sectionId, lessonId, request));
-
-
-    // Delete a lesson from a section
-    [HttpDelete("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> DeleteLesson(int courseId, int sectionId, int lessonId) =>
-        FromResult(await courseService.DeleteLessonAsync(courseId, sectionId, lessonId));
-
-    [HttpPatch("{courseId}/sections/{sectionId}/lessons/{lessonId}/toggle-soft-delete")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> ToggleLessonSoftDelete(int courseId, int sectionId, int lessonId) =>
-        FromResult(await courseService.ToggleLessonSoftDeleteAsync(courseId, sectionId, lessonId));
-
-    // Reorder lessons within a section
-    [HttpPost("{courseId}/sections/{sectionId}/lessons/reorder")]
-    [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> ReorderLessons(int courseId, int sectionId, [FromBody] LessonReorderRequest request) =>
-        FromResult(await courseService.ReorderLessonsAsync(courseId, sectionId, request));
+   
 }
