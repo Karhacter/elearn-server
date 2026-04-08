@@ -107,12 +107,18 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
         }
 
-        if (!await repository.IsUserEnrolledAsync(userId, lesson.CourseId))
+        var lessonCourseId = lesson.CourseSection?.CourseId;
+        if (!lessonCourseId.HasValue)
+        {
+            return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status400BadRequest, "Lesson is not linked to a course section.");
+        }
+
+        if (!await repository.IsUserEnrolledAsync(userId, lessonCourseId.Value))
         {
             return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status403Forbidden, "Bạn chưa đăng ký khóa học này.");
         }
 
-        var course = await repository.GetCourseWithStructureAsync(lesson.CourseId);
+        var course = await repository.GetCourseWithStructureAsync(lessonCourseId.Value);
         if (course is null)
         {
             return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status404NotFound, "Course not found.");
@@ -141,7 +147,7 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             completion = new LessonCompletion
             {
                 UserId = userId,
-                CourseId = lesson.CourseId,
+                CourseId = lessonCourseId.Value,
                 LessonId = lessonId,
                 CompletedAt = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow,
@@ -161,7 +167,7 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             progress = new LessonProgress
             {
                 UserId = userId,
-                CourseId = lesson.CourseId,
+                CourseId = lessonCourseId.Value,
                 LessonId = lessonId,
                 WatchPositionSeconds = 0,
                 LastViewedAt = DateTime.UtcNow,
@@ -176,7 +182,7 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             progress.UpdatedAt = DateTime.UtcNow;
         }
 
-        var courseProgress = await BuildCourseProgressAsync(userId, lesson.CourseId, lessonId, progress.LastViewedAt);
+        var courseProgress = await BuildCourseProgressAsync(userId, lessonCourseId.Value, lessonId, progress.LastViewedAt);
 
         return ServiceResult<LessonProgressResponse>.Ok(new LessonProgressResponse
         {
@@ -198,7 +204,13 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
         }
 
-        if (!await repository.IsUserEnrolledAsync(userId, lesson.CourseId))
+        var lessonCourseId = lesson.CourseSection?.CourseId;
+        if (!lessonCourseId.HasValue)
+        {
+            return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status400BadRequest, "Lesson is not linked to a course section.");
+        }
+
+        if (!await repository.IsUserEnrolledAsync(userId, lessonCourseId.Value))
         {
             return ServiceResult<LessonProgressResponse>.Fail(StatusCodes.Status403Forbidden, "Bạn chưa đăng ký khóa học này.");
         }
@@ -209,7 +221,7 @@ public class ProgressService(IProgressRepository repository) : IProgressService
             progress = new LessonProgress
             {
                 UserId = userId,
-                CourseId = lesson.CourseId,
+                CourseId = lessonCourseId.Value,
                 LessonId = lessonId,
                 WatchPositionSeconds = request.WatchPositionSeconds,
                 LastViewedAt = DateTime.UtcNow,
@@ -226,7 +238,7 @@ public class ProgressService(IProgressRepository repository) : IProgressService
         }
 
         var completion = await repository.GetLessonCompletionAsync(userId, lessonId);
-        await BuildCourseProgressAsync(userId, lesson.CourseId, lessonId, progress.LastViewedAt);
+        await BuildCourseProgressAsync(userId, lessonCourseId.Value, lessonId, progress.LastViewedAt);
 
         return ServiceResult<LessonProgressResponse>.Ok(new LessonProgressResponse
         {

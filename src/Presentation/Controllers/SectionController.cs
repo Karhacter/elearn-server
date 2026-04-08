@@ -14,6 +14,11 @@ public class SectionController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> GetSections(int courseId) =>
         FromResult(await courseService.GetSectionsAsync(courseId));
 
+    [HttpGet("{courseId}/sections/deleted")]
+    [AllowAnonymous]
+    public async Task<IActionResult> getDeleted(int courseId) =>
+        FromResult(await courseService.GetDeletedSectionsAsync(courseId));
+
     [HttpPost("{courseId}/sections")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> CreateSection(int courseId, [FromBody] SectionCreateRequest request) =>
@@ -47,5 +52,8 @@ public class SectionController(ICourseService courseService) : ApiControllerBase
         FromResult(await courseService.ReorderSectionsAsync(courseId, request));
 
 
+    [HttpPost("{courseId}/sections/bulk-soft-delete")]
+    public async Task<IActionResult> BulkSoftDelete(int courseId, [FromBody] BulkSoftDeleteRequest request) =>
+        FromResult(await courseService.BulkSoftDeleteSectionsAsync(courseId, request));
 
 }

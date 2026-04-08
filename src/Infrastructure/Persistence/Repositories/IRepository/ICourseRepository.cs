@@ -20,20 +20,24 @@ public interface ICourseRepository
     Task AddAsync(Course course);
     void Remove(Course course);
 
-
+    // For Sections | Lessons
     Task AddSectionAsync(CourseSection section);
     void RemoveSection(CourseSection section);
     Task AddLessonAsync(Lesson lesson);
     void RemoveLesson(Lesson lesson);
     Task<CourseSection?> GetSectionByIdAsync(int sectionId);
+
+    //
     Task<CourseSection?> GetSectionByIdIncludingDeletedAsync(int sectionId);
     Task<Lesson?> GetLessonByIdAsync(int lessonId);
     Task<Lesson?> GetLessonByIdIncludingDeletedAsync(int lessonId);
     Task<List<CourseSection>> GetSectionsByCourseIdAsync(int courseId);
+    Task<List<CourseSection>> GetSectionsByCourseIdIncludingDeletedAsync(int courseId);
+    Task<List<CourseSection>> GetDeletedSectionsByCourseIdAsync(int courseId);
+
     Task<List<Lesson>> GetLessonsPagedBySectionIdAsync(int sectionId, int page, int pageSize);
     Task<int> CountLessonsBySectionIdAsync(int sectionId);
     Task<List<Lesson>> GetLessonsBySectionIdAsync(int sectionId);
     Task SaveChangesAsync();
     IQueryable<Course> RecommendationQuery();
 }
-

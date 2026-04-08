@@ -1,7 +1,5 @@
-using elearn_server.Infrastructure.Persistence;
 using elearn_server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using elearn_server.Domain.Interfaces;
 using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
 namespace elearn_server.Infrastructure.Persistence.Repositories;
@@ -14,12 +12,14 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         .Include(c => c.LearningOutcomes)
         .Include(c => c.Requirements)
         .Include(c => c.TargetAudiences);
+
     private IQueryable<Course> StructureQuery() => context.Courses
         .Include(c => c.Sections)
             .ThenInclude(s => s.Lessons)
         .Include(c => c.LearningOutcomes)
         .Include(c => c.Requirements)
         .Include(c => c.TargetAudiences);
+
     public Task<List<Course>> GetAllAsync() => BaseQuery().AsNoTracking().ToListAsync();
 
     public Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize) => BaseQuery().AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -85,14 +85,28 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     public Task<CourseSection?> GetSectionByIdIncludingDeletedAsync(int sectionId) =>
         context.CourseSections.IgnoreQueryFilters().Include(s => s.Lessons).SingleOrDefaultAsync(s => s.SectionId == sectionId);
 
+    // Lessons
     public Task<Lesson?> GetLessonByIdAsync(int lessonId) =>
         context.Lessons.SingleOrDefaultAsync(l => l.LessonId == lessonId);
 
     public Task<Lesson?> GetLessonByIdIncludingDeletedAsync(int lessonId) =>
-        context.Lessons.IgnoreQueryFilters().SingleOrDefaultAsync(l => l.LessonId == lessonId);
+        context.Lessons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(l => l.LessonId == lessonId);
+
+
+    public Task<List<CourseSection>> GetDeletedSectionsByCourseIdAsync(int courseId) =>
+        context.CourseSections.IgnoreQueryFilters().Include(s => s.Lessons).Where(s => s.CourseId == courseId && s.IsDeleted).ToListAsync();
 
     public Task<List<CourseSection>> GetSectionsByCourseIdAsync(int courseId) =>
         context.CourseSections.Include(s => s.Lessons).Where(s => s.CourseId == courseId).ToListAsync();
+
+    public Task<List<CourseSection>> GetSectionsByCourseIdIncludingDeletedAsync(int courseId) =>
+        context.CourseSections
+            .IgnoreQueryFilters()
+            .Include(s => s.Lessons)
+            .Where(s => s.CourseId == courseId)
+            .ToListAsync();
 
     public Task<List<Lesson>> GetLessonsPagedBySectionIdAsync(int sectionId, int page, int pageSize) =>
         context.Lessons.Where(l => l.SectionId == sectionId)
@@ -103,8 +117,10 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     public Task<int> CountLessonsBySectionIdAsync(int sectionId) =>
         context.Lessons.CountAsync(l => l.SectionId == sectionId);
     public Task<List<Lesson>> GetLessonsBySectionIdAsync(int sectionId) =>
-        context.Lessons.Where(l => l.SectionId == sectionId).ToListAsync();
+        context.Lessons
+            .Where(l => l.SectionId == sectionId)
+            .ToListAsync();
     public Task SaveChangesAsync() => context.SaveChangesAsync();
     public IQueryable<Course> RecommendationQuery() => BaseQuery().AsNoTracking();
-}
 
+}

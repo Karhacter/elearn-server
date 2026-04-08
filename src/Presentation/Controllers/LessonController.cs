@@ -5,41 +5,45 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace elearn_server.Presentation.Controllers;
 
-[Route("api/course/section")]
+[Route("api/sections")]
 public class LessonController(ICourseService courseService) : ApiControllerBase
 {
-    [HttpGet("{courseId}/sections/{sectionId}/lessons")]
+    // Get lesson with Section
+    [HttpGet("{sectionId}/lessons")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetLessons(int courseId, int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
-            FromResult(await courseService.GetLessonsAsync(courseId, sectionId, page, pageSize));
+    public async Task<IActionResult> GetLessons(int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+            FromResult(await courseService.GetLessonsAsync(sectionId, page, pageSize));
 
-    [HttpPost("{courseId}/sections/{sectionId}/lessons")]
+    // Create lesson
+    [HttpPost("{sectionId}/lessons")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> CreateLesson(int courseId, int sectionId, [FromBody] LessonCreateRequest request) =>
-        FromResult(await courseService.CreateLessonAsync(courseId, sectionId, request));
+    public async Task<IActionResult> CreateLesson(int sectionId, [FromBody] LessonCreateRequest request) =>
+        FromResult(await courseService.CreateLessonAsync(sectionId, request));
 
 
     // Update  lessons
-    [HttpPut("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
+    [HttpPut("{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> UpdateLesson(int courseId, int sectionId, int lessonId, [FromBody] LessonUpdateRequest request) =>
-        FromResult(await courseService.UpdateLessonAsync(courseId, sectionId, lessonId, request));
+    public async Task<IActionResult> UpdateLesson(int sectionId, int lessonId, [FromBody] LessonUpdateRequest request) =>
+        FromResult(await courseService.UpdateLessonAsync(sectionId, lessonId, request));
 
 
     // Delete a lesson from a section
-    [HttpDelete("{courseId}/sections/{sectionId}/lessons/{lessonId}")]
+    [HttpDelete("{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> DeleteLesson(int courseId, int sectionId, int lessonId) =>
-        FromResult(await courseService.DeleteLessonAsync(courseId, sectionId, lessonId));
+    public async Task<IActionResult> DeleteLesson(int sectionId, int lessonId) =>
+        FromResult(await courseService.DeleteLessonAsync(sectionId, lessonId));
 
-    [HttpPatch("{courseId}/sections/{sectionId}/lessons/{lessonId}/toggle-soft-delete")]
+    // Change between soft-delete and restore
+    [HttpPatch("{sectionId}/lessons/{lessonId}/toggle-soft-delete")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> ToggleLessonSoftDelete(int courseId, int sectionId, int lessonId) =>
-        FromResult(await courseService.ToggleLessonSoftDeleteAsync(courseId, sectionId, lessonId));
+    public async Task<IActionResult> ToggleLessonSoftDelete(int sectionId, int lessonId) =>
+        FromResult(await courseService.ToggleLessonSoftDeleteAsync(sectionId, lessonId));
 
-    // Reorder lessons within a section
-    [HttpPost("{courseId}/sections/{sectionId}/lessons/reorder")]
+
+    // Reorder lessons within a section - sap xep lai dua tren order
+    [HttpPost("{sectionId}/lessons/reorder")]
     [Authorize(Roles = "Admin,Instructor")]
-    public async Task<IActionResult> ReorderLessons(int courseId, int sectionId, [FromBody] LessonReorderRequest request) =>
-        FromResult(await courseService.ReorderLessonsAsync(courseId, sectionId, request));
+    public async Task<IActionResult> ReorderLessons(int sectionId, [FromBody] LessonReorderRequest request) =>
+        FromResult(await courseService.ReorderLessonsAsync(sectionId, request));
 }

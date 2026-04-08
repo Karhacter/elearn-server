@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using elearn_server.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using elearn_server.Infrastructure.Persistence;
 namespace elearn_server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260404020457_AddUserProfileFields")]
+    partial class AddUserProfileFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -635,9 +638,6 @@ namespace elearn_server.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -785,6 +785,9 @@ namespace elearn_server.Migrations
                     b.Property<string>("ContentUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -825,6 +828,8 @@ namespace elearn_server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("LessonId");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("SectionId", "Order")
                         .IsUnique();
@@ -1629,7 +1634,8 @@ namespace elearn_server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1887,7 +1893,7 @@ namespace elearn_server.Migrations
                     b.HasOne("elearn_server.Domain.Entities.Course", "Course")
                         .WithMany("Requirements")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Course");
@@ -1909,7 +1915,7 @@ namespace elearn_server.Migrations
                     b.HasOne("elearn_server.Domain.Entities.Course", "Course")
                         .WithMany("TargetAudiences")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Course");
@@ -1950,7 +1956,7 @@ namespace elearn_server.Migrations
                     b.HasOne("elearn_server.Domain.Entities.Course", "Course")
                         .WithMany("LearningOutcomes")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Course");
@@ -1958,11 +1964,19 @@ namespace elearn_server.Migrations
 
             modelBuilder.Entity("elearn_server.Domain.Entities.Lesson", b =>
                 {
+                    b.HasOne("elearn_server.Domain.Entities.Course", "Course")
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("elearn_server.Domain.Entities.CourseSection", "CourseSection")
                         .WithMany("Lessons")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("CourseSection");
                 });
@@ -2237,6 +2251,8 @@ namespace elearn_server.Migrations
                     b.Navigation("Enrollments");
 
                     b.Navigation("LearningOutcomes");
+
+                    b.Navigation("Lessons");
 
                     b.Navigation("Payments");
 

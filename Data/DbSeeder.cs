@@ -136,7 +136,121 @@ public class DbSeeder
             new Category { Name = "Data Science", Description = "Data Science dev", CreatedAt = DateTime.Now }
         };
     }
+    private string GenerateSectionTitle(int order)
+    {
+        var titles = new[]
+        {
+        "Introduction",
+        "Getting Started",
+        "Core Concepts",
+        "Advanced Topics",
+        "Real Project",
+        "Deployment"
+    };
 
+        return $"{order}. {titles[order - 1 < titles.Length ? order - 1 : 0]}";
+    }
+
+    public List<CourseSection> GenerateSections(List<Course> courses)
+    {
+        var faker = new Faker();
+        var sections = new List<CourseSection>();
+
+        foreach (var course in courses)
+        {
+            int sectionCount = faker.Random.Int(3, 6); // mỗi course có 3-6 section
+
+            for (int i = 1; i <= sectionCount; i++)
+            {
+                sections.Add(new CourseSection
+                {
+                    Title = GenerateSectionTitle(i),
+                    Description = faker.Lorem.Sentence(10),
+                    Order = i,
+                    CourseId = course.CourseId,
+                    CreatedAt = DateTime.Now
+                });
+            }
+        }
+
+        return sections;
+    }
+
+    private string GenerateLessonTitle(string sectionTitle, int order)
+    {
+        var topics = new[]
+        {
+        "Introduction",
+        "Setup Environment",
+        "Core Concept",
+        "Hands-on Practice",
+        "Deep Dive",
+        "Best Practices",
+        "Summary"
+    };
+
+        return $"{order}. {topics[order - 1 < topics.Length ? order - 1 : 0]}";
+    }
+
+    private string GenerateContentUrl(LessonType type)
+    {
+        return type switch
+        {
+            LessonType.Video => "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            LessonType.Resource => "https://example.com/article",
+            LessonType.Quiz => "https://example.com/quiz",
+            _ => "https://example.com/content"
+        };
+    }
+
+    private int GenerateDuration(LessonType type)
+    {
+        return type switch
+        {
+            LessonType.Video => Random.Shared.Next(5, 30),
+            LessonType.Resource => Random.Shared.Next(3, 15),
+            LessonType.Quiz => Random.Shared.Next(1, 10),
+            _ => 5
+        };
+    }
+
+
+    public List<Lesson> GenerateLessons(List<CourseSection> sections)
+    {
+        var faker = new Faker();
+        var lessons = new List<Lesson>();
+
+        var lessonTypes = new[]
+        {
+        LessonType.Video,
+        LessonType.Resource,
+        LessonType.Quiz
+    };
+
+        foreach (var section in sections)
+        {
+            int lessonCount = faker.Random.Int(4, 8);
+
+            for (int i = 1; i <= lessonCount; i++)
+            {
+                var type = faker.PickRandom(lessonTypes);
+
+                lessons.Add(new Lesson
+                {
+                    Title = GenerateLessonTitle(section.Title, i),
+                    ContentUrl = GenerateContentUrl(type),
+                    Type = type,
+                    Duration = GenerateDuration(type),
+                    Order = i,
+                    SectionId = section.SectionId,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Now
+                });
+            }
+        }
+
+        return lessons;
+    }
     public void Seed()
     {
         if (_context.Users.Any()) return;
@@ -153,6 +267,13 @@ public class DbSeeder
         _context.Courses.AddRange(courses);
         _context.SaveChanges();
 
+        var sections = GenerateSections(courses);
+        _context.CourseSections.AddRange(sections);
+        _context.SaveChanges();
+
+        var lessons = GenerateLessons(sections);
+        _context.Lessons.AddRange(lessons);
+        _context.SaveChanges();
     }
 }
 

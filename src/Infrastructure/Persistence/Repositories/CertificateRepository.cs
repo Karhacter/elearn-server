@@ -26,7 +26,7 @@ public class CertificateRepository(AppDbContext context) : ICertificateRepositor
         context.Enrollments.AnyAsync(e => e.UserId == userId && e.CourseId == courseId && e.IsActive);
 
     public Task<int> GetTotalLessonsByCourseAsync(int courseId) =>
-        context.Lessons.CountAsync(l => l.CourseId == courseId);
+        context.Lessons.CountAsync(l => l.CourseSection != null && l.CourseSection.CourseId == courseId);
 
     public Task<int> GetCompletedLessonsByUserAndCourseAsync(int userId, int courseId) =>
         context.LessonCompletions

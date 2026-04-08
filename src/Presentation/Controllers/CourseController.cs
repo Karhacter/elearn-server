@@ -85,5 +85,5 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
 
 
     // Add, update, and delete sections and lessons within a course
-   
+
 }

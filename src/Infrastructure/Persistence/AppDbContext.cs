@@ -74,6 +74,7 @@ public class AppDbContext : DbContext
 
         // Relationships and Constraints
         modelBuilder.Entity<Course>().ToTable("Course");
+        modelBuilder.Entity<Course>().Ignore(c => c.Lessons);
 
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<User>().Property(u => u.Gender).HasConversion<string>();
@@ -118,11 +119,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Lesson>()
             .HasIndex(l => new { l.SectionId, l.Order })
             .IsUnique();
-
-        modelBuilder.Entity<Lesson>()
-            .HasOne(l => l.Course)
-            .WithMany(c => c.Lessons)
-            .HasForeignKey(l => l.CourseId);
 
         modelBuilder.Entity<LearningOutcome>()
             .HasOne(lo => lo.Course)

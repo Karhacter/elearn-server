@@ -326,10 +326,80 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<CourseResponse>.Ok(updated!.ToResponse(), "Course moved to draft.");
     }
 
+
+    // For Sections
     public async Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> GetSectionsAsync(int courseId)
     {
         var sections = await repository.GetSectionsByCourseIdAsync(courseId);
         return ServiceResult<IReadOnlyCollection<SectionResponse>>.Ok(sections.Select(s => s.ToResponse()).ToList());
+    }
+
+    public async Task<ServiceResult<IReadOnlyCollection<SectionResponse>>> GetDeletedSectionsAsync(int courseId)
+    {
+        var sections = await repository.GetDeletedSectionsByCourseIdAsync(courseId);
+        return ServiceResult<IReadOnlyCollection<SectionResponse>>.Ok(sections.Select(s => s.ToResponse()).ToList());
+    }
+
+
+    public async Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteSectionsAsync(int courseId, BulkSoftDeleteRequest request)
+    {
+        var course = await repository.GetByIdAsync(courseId);
+        if (course is null)
+        {
+            return ServiceResult<BulkSoftDeleteResponse>.Fail(StatusCodes.Status404NotFound, "Course not found.");
+        }
+
+        var ids = request.Ids
+            .Where(id => id > 0)
+            .Distinct()
+            .ToList();
+
+        var sections = await repository.GetSectionsByCourseIdIncludingDeletedAsync(courseId);
+        var matchedSections = sections
+            .Where(s => ids.Contains(s.SectionId))
+            .ToList();
+        var processedCount = 0;
+
+        foreach (var section in matchedSections)
+        {
+            if (request.Restore)
+            {
+                if (!section.IsDeleted)
+                {
+                    continue;
+                }
+
+                section.IsDeleted = false;
+                section.DeletedAt = null;
+                section.DeletedBy = null;
+            }
+            else
+            {
+                if (section.IsDeleted)
+                {
+                    continue;
+                }
+
+                section.IsDeleted = true;
+                section.DeletedAt = DateTime.UtcNow;
+                section.DeletedBy = "Admin";
+            }
+
+            section.UpdatedAt = DateTime.UtcNow;
+            processedCount++;
+        }
+
+        if (processedCount > 0)
+        {
+            await repository.SaveChangesAsync();
+        }
+
+        return ServiceResult<BulkSoftDeleteResponse>.Ok(new BulkSoftDeleteResponse
+        {
+            RequestedCount = request.Ids.Count,
+            ProcessedCount = processedCount,
+            IgnoredCount = ids.Count - processedCount
+        }, request.Restore ? "Sections restored successfully." : "Sections soft deleted successfully.");
     }
 
     public async Task<ServiceResult<SectionResponse>> CreateSectionAsync(int courseId, SectionCreateRequest request)
@@ -452,10 +522,13 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<IReadOnlyCollection<SectionResponse>>.Ok(updated.OrderBy(s => s.Order).Select(s => s.ToResponse()).ToList());
     }
 
-    public async Task<ServiceResult<PagedResult<LessonResponse>>> GetLessonsAsync(int courseId, int sectionId, int page, int pageSize)
+
+    // For Lessons
+
+    public async Task<ServiceResult<PagedResult<LessonResponse>>> GetLessonsAsync(int sectionId, int page, int pageSize)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
-        if (section is null || section.CourseId != courseId)
+        if (section is null)
         {
             return ServiceResult<PagedResult<LessonResponse>>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }
@@ -475,10 +548,10 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         });
     }
 
-    public async Task<ServiceResult<LessonResponse>> CreateLessonAsync(int courseId, int sectionId, LessonCreateRequest request)
+    public async Task<ServiceResult<LessonResponse>> CreateLessonAsync(int sectionId, LessonCreateRequest request)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
-        if (section is null || section.CourseId != courseId)
+        if (section is null)
         {
             return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }
@@ -493,7 +566,6 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
 
         var lesson = new Lesson
         {
-            CourseId = courseId,
             SectionId = sectionId,
             Title = request.Title.Trim(),
             ContentUrl = request.ContentUrl?.Trim(),
@@ -512,12 +584,18 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<LessonResponse>.Created(created!.ToResponse(), "Lesson created successfully.");
     }
 
-    public async Task<ServiceResult<LessonResponse>> UpdateLessonAsync(int courseId, int sectionId, int lessonId, LessonUpdateRequest request)
+    public async Task<ServiceResult<LessonResponse>> UpdateLessonAsync(int sectionId, int lessonId, LessonUpdateRequest request)
     {
         var lesson = await repository.GetLessonByIdAsync(lessonId);
-        if (lesson is null || lesson.CourseId != courseId || lesson.SectionId != sectionId)
+        if (lesson is null || lesson.SectionId != sectionId)
         {
             return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
+        }
+
+        var section = await repository.GetSectionByIdAsync(sectionId);
+        if (section is null)
+        {
+            return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }
 
         if (!TryParseLessonType(request.Type, out var lessonType))
@@ -542,12 +620,18 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<LessonResponse>.Ok(updated!.ToResponse(), "Lesson updated successfully.");
     }
 
-    public async Task<ServiceResult<object>> DeleteLessonAsync(int courseId, int sectionId, int lessonId)
+    public async Task<ServiceResult<object>> DeleteLessonAsync(int sectionId, int lessonId)
     {
         var lesson = await repository.GetLessonByIdAsync(lessonId);
-        if (lesson is null || lesson.CourseId != courseId || lesson.SectionId != sectionId)
+        if (lesson is null || lesson.SectionId != sectionId)
         {
             return ServiceResult<object>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
+        }
+
+        var section = await repository.GetSectionByIdAsync(sectionId);
+        if (section is null)
+        {
+            return ServiceResult<object>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }
 
         repository.RemoveLesson(lesson);
@@ -556,12 +640,18 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return ServiceResult<object>.Ok(null, "Lesson deleted successfully.");
     }
 
-    public async Task<ServiceResult<LessonResponse>> ToggleLessonSoftDeleteAsync(int courseId, int sectionId, int lessonId)
+    public async Task<ServiceResult<LessonResponse>> ToggleLessonSoftDeleteAsync(int sectionId, int lessonId)
     {
         var lesson = await repository.GetLessonByIdIncludingDeletedAsync(lessonId);
-        if (lesson is null || lesson.CourseId != courseId || lesson.SectionId != sectionId)
+        if (lesson is null || lesson.SectionId != sectionId)
         {
             return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Lesson not found.");
+        }
+
+        var section = await repository.GetSectionByIdIncludingDeletedAsync(sectionId);
+        if (section is null)
+        {
+            return ServiceResult<LessonResponse>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }
 
         if (lesson.IsDeleted)
@@ -584,10 +674,10 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
             lesson.IsDeleted ? "Lesson soft deleted successfully." : "Lesson restored successfully.");
     }
 
-    public async Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int courseId, int sectionId, LessonReorderRequest request)
+    public async Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int sectionId, LessonReorderRequest request)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
-        if (section is null || section.CourseId != courseId)
+        if (section is null)
         {
             return ServiceResult<IReadOnlyCollection<LessonResponse>>.Fail(StatusCodes.Status404NotFound, "Section not found.");
         }

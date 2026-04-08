@@ -30,10 +30,5 @@ public class Lesson : BaseEntity
     public int SectionId { get; set; }
     public CourseSection? CourseSection { get; set; }
 
-    [ForeignKey(nameof(Course))]
-    [Required(ErrorMessage = "Course ID is required")]
-    public int CourseId { get; set; }
-    public Course? Course { get; set; }
-
     public bool IsDeleted { get; set; }
 }

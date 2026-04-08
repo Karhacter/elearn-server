@@ -8,7 +8,6 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
 {
     public Task<Lesson?> GetLessonByIdAsync(int lessonId) =>
         context.Lessons
-            .Include(l => l.Course)
             .Include(l => l.CourseSection)
             .SingleOrDefaultAsync(l => l.LessonId == lessonId);
 
@@ -51,7 +50,7 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
             .ToListAsync();
 
     public Task<int> CountLessonsForCourseAsync(int courseId) =>
-        context.Lessons.CountAsync(l => l.CourseId == courseId);
+        context.Lessons.CountAsync(l => l.CourseSection != null && l.CourseSection.CourseId == courseId);
 
     public Task AddCourseProgressAsync(CourseProgress progress) => context.CourseProgresses.AddAsync(progress).AsTask();
     public Task AddLessonProgressAsync(LessonProgress progress) => context.LessonProgresses.AddAsync(progress).AsTask();
