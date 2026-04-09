@@ -21,6 +21,7 @@ public class LessonController(ICourseService courseService) : ApiControllerBase
         FromResult(await courseService.CreateLessonAsync(sectionId, request));
 
 
+    
     // Update  lessons
     [HttpPut("{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]

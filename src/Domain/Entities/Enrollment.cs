@@ -22,9 +22,9 @@ namespace elearn_server.Domain.Entities
 
         // Navigation Properties
         [ForeignKey("UserId")]
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey("CourseId")]
-        public Course Course { get; set; }
+        public Course? Course { get; set; }
     }
 }

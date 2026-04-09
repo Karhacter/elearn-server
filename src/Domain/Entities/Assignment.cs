@@ -17,10 +17,10 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Title is required")]
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [Required(ErrorMessage = "Description is required")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataType(DataType.DateTime)]
         [Required(ErrorMessage = "Due Date is required")]

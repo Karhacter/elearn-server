@@ -23,7 +23,7 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Certificate URL is required")]
         [Url(ErrorMessage = "Invalid URL format")]
-        public string CertificateUrl { get; set; }
+        public string? CertificateUrl { get; set; }
 
         [MaxLength(64)]
         public string? VerificationCode { get; set; }

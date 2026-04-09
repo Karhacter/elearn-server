@@ -9,16 +9,16 @@ public class Order : BaseEntity
     public int OrderID { set; get; }
 
     [MaxLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [MaxLength(10, ErrorMessage = "Phone cannot exceed 10 characters")]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     [EmailAddress(ErrorMessage = "Invalid email format")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
     [MaxLength(100, ErrorMessage = "Address cannot exceed 100 characters")]
-    public string Address { get; set; }
+    public string? Address { get; set; }
 
     [ForeignKey("UserId")]
     public User? User { get; set; }
@@ -26,7 +26,7 @@ public class Order : BaseEntity
     [Required(ErrorMessage = "User ID is required")]
     public int user_id { get; set; }
 
-    public ICollection<OrderDetail> OrderDetails { get; set; }
+    public ICollection<OrderDetail>? OrderDetails { get; set; }
 
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
 }

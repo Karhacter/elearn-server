@@ -11,6 +11,6 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Role name is required")]
         [StringLength(20, MinimumLength = 3, ErrorMessage = "Role must be 3-20 characters")]
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace PhatDat_TH2.Request
+﻿namespace elearn_server.Application.Requests
 {
     public class OrderDetailRequest
     {

@@ -28,7 +28,7 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Comment is required")]
         [StringLength(500, ErrorMessage = "Comment cannot exceed 500 characters")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime CommentDate { get; set; } = DateTime.UtcNow;

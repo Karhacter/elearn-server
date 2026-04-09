@@ -11,12 +11,12 @@ namespace elearn_server.Domain.Entities
         [Required]
         public int CartId { get; set; }
 
-        public Cart Cart { get; set; }
+        public Cart? Cart { get; set; }
 
         [Required]
         public int CourseID { get; set; }
 
-        public Course Course { get; set; }
+        public Course? Course { get; set; }
 
         public int Quantity { get; set; }
         public decimal PriceAtTime { get; set; }

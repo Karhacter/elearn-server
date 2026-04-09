@@ -11,7 +11,7 @@ public class Lesson : BaseEntity
 
     [Required(ErrorMessage = "Lesson title is required")]
     [MaxLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Url(ErrorMessage = "Invalid URL format")]
     public string? ContentUrl { get; set; }

@@ -8,7 +8,7 @@ namespace elearn_server.Application.DTOs
 {
     public class OrderUpdateDTO
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "The Status field is required.")]
         [JsonPropertyName("status")]
@@ -17,6 +17,6 @@ namespace elearn_server.Application.DTOs
         [Required(ErrorMessage = "The Items field is required.")]
         [MinLength(1, ErrorMessage = "The Items field must contain at least one item.")]
         [JsonPropertyName("orderDetails")]
-        public List<OrderItemRequest> Items { get; set; }
+        public List<OrderItemRequest>? Items { get; set; }
     }
 }

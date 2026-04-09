@@ -17,7 +17,7 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Message is required")]
         [StringLength(200, ErrorMessage = "Message cannot exceed 200 characters")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public bool IsRead { get; set; } = false;
 
