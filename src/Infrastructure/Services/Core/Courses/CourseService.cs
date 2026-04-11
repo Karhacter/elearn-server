@@ -524,7 +524,6 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
 
 
     // For Lessons
-
     public async Task<ServiceResult<PagedResult<LessonResponse>>> GetLessonsAsync(int sectionId, int page, int pageSize)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
@@ -674,6 +673,82 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
             lesson.IsDeleted ? "Lesson soft deleted successfully." : "Lesson restored successfully.");
     }
 
+    // soft delete list of lessons
+    public async Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteLessonsAsync(int sectionId, BulkSoftDeleteRequest request)
+    {
+        var section = await repository.GetSectionByIdAsync(sectionId);
+        if (section is null)
+        {
+            return ServiceResult<BulkSoftDeleteResponse>.Fail(StatusCodes.Status404NotFound, "Section not found.");
+        }
+
+        var ids = request.Ids
+            .Where(id => id > 0)
+            .Distinct()
+            .ToList();
+
+        var lessons = await repository.GetLessonsBySectionIdIncludingDeletedAsync(sectionId);
+        var matchedLessons = lessons
+            .Where(s => ids.Contains(s.LessonId))
+            .ToList();
+        var processedCount = 0;
+
+        foreach (var lesson in matchedLessons)
+        {
+            if (request.Restore)
+            {
+                if (!lesson.IsDeleted)
+                {
+                    continue;
+                }
+
+                lesson.IsDeleted = false;
+                lesson.DeletedAt = null;
+                lesson.DeletedBy = null;
+            }
+            else
+            {
+                if (lesson.IsDeleted)
+                {
+                    continue;
+                }
+
+                lesson.IsDeleted = true;
+                lesson.DeletedAt = DateTime.UtcNow;
+                lesson.DeletedBy = "Admin";
+            }
+
+            lesson.UpdatedAt = DateTime.UtcNow;
+            processedCount++;
+        }
+
+        if (processedCount > 0)
+        {
+            await repository.SaveChangesAsync();
+        }
+
+        return ServiceResult<BulkSoftDeleteResponse>.Ok(new BulkSoftDeleteResponse
+        {
+            RequestedCount = request.Ids.Count,
+            ProcessedCount = processedCount,
+            IgnoredCount = ids.Count - processedCount
+        }, request.Restore ? "Lessons restored successfully." : "Lessons soft deleted successfully.");
+    }
+
+    public async Task<ServiceResult<PagedResult<LessonResponse>>> GetDeletedLessonsAsync(int sectionId, int page, int pageSize)
+    {
+        var lessons = await repository.GetLessonsBySectionIdIncludingDeletedAsync(sectionId);
+        var deletedLessons = lessons.Where(l => l.IsDeleted).ToList();
+        var pagedResult = new PagedResult<LessonResponse>
+        {
+            Items = deletedLessons.Select(l => l.ToResponse()).ToList(),
+            TotalCount = deletedLessons.Count,
+            PageNumber = page,
+            PageSize = pageSize
+        };
+        return ServiceResult<PagedResult<LessonResponse>>.Ok(pagedResult);
+    }
+
     public async Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int sectionId, LessonReorderRequest request)
     {
         var section = await repository.GetSectionByIdAsync(sectionId);
@@ -745,6 +820,7 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         return Enum.TryParse(normalized, true, out lessonType);
     }
 
+    // Others
     private static List<LearningOutcome> BuildOutcomeList(IEnumerable<string> items, Course course)
     {
         var result = new List<LearningOutcome>();

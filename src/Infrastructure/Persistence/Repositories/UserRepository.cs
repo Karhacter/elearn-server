@@ -8,10 +8,16 @@ public class UserRepository(AppDbContext context) : IUserRepository
 {
     public Task<List<User>> GetAllAsync() => context.Users.AsNoTracking().ToListAsync();
     public Task<List<User>> GetPagedAsync(int page, int pageSize) =>
-        context.Users.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-    public Task<int> CountAsync() => context.Users.CountAsync();
+        context.Users.Where(u => u.Role == "Student").AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+    public Task<int> CountAsync() => context.Users.Where(u => u.Role == "Student").CountAsync();
 
-    public Task<List<User>> GetAllDeletedAsync() => context.Users.IgnoreQueryFilters().Where(u => u.IsDeleted).AsNoTracking().ToListAsync();
+    public Task<List<User>> GetPagedInstructorsAsync(int page, int pageSize) =>
+        context.Users.Where(u => u.Role == "Instructor").AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+    public Task<int> CountInstructorsAsync() => context.Users.Where(u => u.Role == "Instructor").CountAsync();
+
+    public Task<List<User>> GetAllDeletedAsync() => context.Users.IgnoreQueryFilters().Where(u => u.IsDeleted && u.Role == "Student").AsNoTracking().ToListAsync();
+
+    public Task<List<User>> GetAllDeletedInstructorsAsync() => context.Users.IgnoreQueryFilters().Where(u => u.IsDeleted && u.Role == "Instructor").AsNoTracking().ToListAsync();
 
     public Task<User?> GetByIdAsync(int id) => context.Users.SingleOrDefaultAsync(u => u.UserId == id);
 

@@ -8,6 +8,7 @@ using elearn_server.Infrastructure.Services.Core.Auth;
 using elearn_server.Infrastructure.Services.Core.Assignments;
 using elearn_server.Infrastructure.Services.Core.Categories;
 using elearn_server.Infrastructure.Services.Core.Courses;
+using elearn_server.Infrastructure.Services.Core.Notifications;
 using elearn_server.Infrastructure.Services.Core.Progress;
 using elearn_server.Infrastructure.Services.Core.Quizzes;
 using elearn_server.Infrastructure.Services.Core.Users;
@@ -54,6 +55,7 @@ public static class ServiceExtensions
         services.AddScoped<ICertificateRepository, CertificateRepository>();
         services.AddScoped<IProgressRepository, ProgressRepository>();
         services.AddScoped<IQuizRepository, QuizRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         return services;
     }
 
@@ -83,6 +85,12 @@ public static class ServiceExtensions
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<ICommentService, CommentService>();
         services.AddScoped<ICertificateService, CertificateService>();
+        services.AddScoped<INotificationService, NotificationService>();
+
+        services.AddScoped<IMenuService, MenuService>();
+        services.AddScoped<IContactService, ContactService>();
+        services.AddScoped<ITopicService, TopicService>();
+        services.AddScoped<IPostService, PostService>();
         return services;
     }
 

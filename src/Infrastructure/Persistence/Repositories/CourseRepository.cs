@@ -46,7 +46,11 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         var query = BaseQuery().AsNoTracking();
         if (!string.IsNullOrWhiteSpace(keyword))
         {
-            query = query.Where(c => (c.Title ?? string.Empty).Contains(keyword) || (c.Description ?? string.Empty).Contains(keyword));
+            query = query.Where(c =>
+                (c.Title ?? string.Empty).Contains(keyword) ||
+                (c.Description ?? string.Empty).Contains(keyword) ||
+                (c.Instructor != null && (c.Instructor.FullName ?? string.Empty).Contains(keyword)) ||
+                (c.Genre != null && (c.Genre.Name ?? string.Empty).Contains(keyword)));
         }
         if (genreId.HasValue) query = query.Where(c => c.GenreId == genreId.Value);
         if (instructorId.HasValue) query = query.Where(c => c.InstructorId == instructorId.Value);
@@ -94,6 +98,11 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(l => l.LessonId == lessonId);
 
+    public Task<List<Lesson>> GetLessonsBySectionIdIncludingDeletedAsync(int sectionId) =>
+        context.Lessons
+            .IgnoreQueryFilters()
+            .Where(l => l.SectionId == sectionId)
+            .ToListAsync();
 
     public Task<List<CourseSection>> GetDeletedSectionsByCourseIdAsync(int courseId) =>
         context.CourseSections.IgnoreQueryFilters().Include(s => s.Lessons).Where(s => s.CourseId == courseId && s.IsDeleted).ToListAsync();

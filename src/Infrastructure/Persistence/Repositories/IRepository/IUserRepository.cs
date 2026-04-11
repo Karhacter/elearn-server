@@ -6,8 +6,11 @@ public interface IUserRepository
 {
     Task<List<User>> GetAllAsync();
     Task<List<User>> GetPagedAsync(int page, int pageSize);
+    Task<List<User>> GetPagedInstructorsAsync(int page, int pageSize);
     Task<int> CountAsync();
+    Task<int> CountInstructorsAsync();
     Task<List<User>> GetAllDeletedAsync();
+    Task<List<User>> GetAllDeletedInstructorsAsync();
     Task<User?> GetByIdAsync(int id);
     Task<User?> GetByIdIncludingDeletedAsync(int id);
     Task<User?> GetByEmailAsync(string email);

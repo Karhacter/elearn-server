@@ -14,14 +14,17 @@ public class LessonController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> GetLessons(int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
             FromResult(await courseService.GetLessonsAsync(sectionId, page, pageSize));
 
+    [HttpGet("{sectionId}/lessons/deleted")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetDeletedLessons(int sectionId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+            FromResult(await courseService.GetDeletedLessonsAsync(sectionId, page, pageSize));
+
     // Create lesson
     [HttpPost("{sectionId}/lessons")]
     [Authorize(Roles = "Admin,Instructor")]
     public async Task<IActionResult> CreateLesson(int sectionId, [FromBody] LessonCreateRequest request) =>
         FromResult(await courseService.CreateLessonAsync(sectionId, request));
 
-
-    
     // Update  lessons
     [HttpPut("{sectionId}/lessons/{lessonId}")]
     [Authorize(Roles = "Admin,Instructor")]
@@ -41,6 +44,9 @@ public class LessonController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> ToggleLessonSoftDelete(int sectionId, int lessonId) =>
         FromResult(await courseService.ToggleLessonSoftDeleteAsync(sectionId, lessonId));
 
+    [HttpPost("{sectionId}/lessons/bulk-soft-delete")]
+    [Authorize(Roles = "Admin, Instructor")]
+    public async Task<IActionResult> BulkSoftDeleteLessons(int sectionId, [FromBody] BulkSoftDeleteRequest request) => FromResult(await courseService.BulkSoftDeleteLessonsAsync(sectionId, request));
 
     // Reorder lessons within a section - sap xep lai dua tren order
     [HttpPost("{sectionId}/lessons/reorder")]

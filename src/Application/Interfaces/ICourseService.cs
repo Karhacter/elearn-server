@@ -45,5 +45,9 @@ public interface ICourseService
     Task<ServiceResult<LessonResponse>> UpdateLessonAsync(int sectionId, int lessonId, LessonUpdateRequest request);
     Task<ServiceResult<object>> DeleteLessonAsync(int sectionId, int lessonId);
     Task<ServiceResult<LessonResponse>> ToggleLessonSoftDeleteAsync(int sectionId, int lessonId);
+
+    Task<ServiceResult<PagedResult<LessonResponse>>> GetDeletedLessonsAsync(int sectionId, int page, int pageSize);
+
+    Task<ServiceResult<BulkSoftDeleteResponse>> BulkSoftDeleteLessonsAsync(int sectionId, BulkSoftDeleteRequest request);
     Task<ServiceResult<IReadOnlyCollection<LessonResponse>>> ReorderLessonsAsync(int sectionId, LessonReorderRequest request);
 }

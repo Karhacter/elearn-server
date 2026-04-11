@@ -45,6 +45,12 @@ public class AppDbContext : DbContext
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
 
+    public DbSet<Menu> Menus { get; set; }
+    public DbSet<Contact> Contacts { get; set; }
+    public DbSet<Topic> Topics { get; set; }
+    public DbSet<Post> Posts { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -58,8 +64,8 @@ public class AppDbContext : DbContext
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             // Exempt dependent entities that should be deleted when severed from Course
-            var isDependentEntity = entity.ClrType == typeof(LearningOutcome) || 
-                                   entity.ClrType == typeof(CourseRequirement) || 
+            var isDependentEntity = entity.ClrType == typeof(LearningOutcome) ||
+                                   entity.ClrType == typeof(CourseRequirement) ||
                                    entity.ClrType == typeof(CourseTargetAudience);
 
             foreach (var foreignKey in entity.GetForeignKeys())
@@ -380,6 +386,13 @@ public class AppDbContext : DbContext
             .HasOne(n => n.User)
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.UserId);
+
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Notification>()
+            .HasQueryFilter(n => !n.IsDeleted);
 
         // User - PasswordResetToken (One-to-Many)
         modelBuilder.Entity<PasswordResetToken>()

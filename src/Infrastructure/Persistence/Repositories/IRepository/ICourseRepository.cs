@@ -28,6 +28,8 @@ public interface ICourseRepository
     Task<CourseSection?> GetSectionByIdAsync(int sectionId);
 
     //
+    Task<List<Lesson>> GetLessonsBySectionIdIncludingDeletedAsync(int sectionId);
+
     Task<CourseSection?> GetSectionByIdIncludingDeletedAsync(int sectionId);
     Task<Lesson?> GetLessonByIdAsync(int lessonId);
     Task<Lesson?> GetLessonByIdIncludingDeletedAsync(int lessonId);

@@ -32,6 +32,27 @@ public class UserService(IUserRepository repository, IFileStorageService fileSto
         });
     }
 
+    public async Task<ServiceResult<PagedResult<AuthenticatedUserResponse>>> GetAllInstructorsAsync(int page, int pageSize)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Max(1, pageSize);
+
+        var users = await repository.GetPagedInstructorsAsync(page, pageSize);
+        var totalCount = await repository.CountInstructorsAsync();
+
+        return ServiceResult<PagedResult<AuthenticatedUserResponse>>.Ok(new PagedResult<AuthenticatedUserResponse>
+        {
+            Items = users.Select(u => u.ToAuthenticatedUserResponse()).ToList(),
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+    // Get deleted Instructor
+    public async Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetDeletedInstructorsAsync(int page, int pageSize) =>
+        ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>.Ok((await repository.GetAllDeletedInstructorsAsync()).Select(u => u.ToAuthenticatedUserResponse()).ToList());
+
+
     public async Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetDeletedAsync() =>
         ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>.Ok((await repository.GetAllDeletedAsync()).Select(u => u.ToAuthenticatedUserResponse()).ToList());
 

@@ -10,14 +10,28 @@ namespace elearn_server.Presentation.Controllers;
 [Authorize(Roles = "Admin")]
 public class UserController(IUserService userService) : ApiControllerBase
 {
+
+    // Get all user with role is Student
     [HttpGet]
     public async Task<IActionResult> GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         FromResult(await userService.GetAllAsync(page, pageSize));
 
-    // get Deleted Users
+    // Get all user with role is Instructor
+    [HttpGet("instructors")]
+    public async Task<IActionResult> GetAllInstructors([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        FromResult(await userService.GetAllInstructorsAsync(page, pageSize));
+
+    // get Deleted Users Role Student
     [HttpGet("deleted")]
     public async Task<IActionResult> GetDeletedUsers() => FromResult(await userService.GetDeletedAsync());
-    
+
+
+    // Get Deleted user with role is Instructor
+    [HttpGet("instructors/deleted")]
+    public async Task<IActionResult> GetDeletedInstructors([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        FromResult(await userService.GetDeletedInstructorsAsync(page, pageSize));
+
+
     [HttpGet("detail/{id}")]
     public async Task<IActionResult> GetUserById(int id) => FromResult(await userService.GetByIdAsync(id));
 

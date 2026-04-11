@@ -10,6 +10,13 @@ public interface IUserService
 {
     Task<ServiceResult<PagedResult<AuthenticatedUserResponse>>> GetAllAsync(int page, int pageSize);
     Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetDeletedAsync();
+
+    // get role Instructor
+    Task<ServiceResult<PagedResult<AuthenticatedUserResponse>>> GetAllInstructorsAsync(int page, int pageSize);
+    // get deleted Instructor
+    Task<ServiceResult<IReadOnlyCollection<AuthenticatedUserResponse>>> GetDeletedInstructorsAsync(int page, int pageSize);
+
+
     Task<ServiceResult<AuthenticatedUserResponse>> GetByIdAsync(int id);
     Task<ServiceResult<AuthenticatedUserResponse>> CreateAsync(UserCreateDTO request);
     Task<ServiceResult<AuthenticatedUserResponse>> UpdateAsync(int id, UserUpdateRequest request);
