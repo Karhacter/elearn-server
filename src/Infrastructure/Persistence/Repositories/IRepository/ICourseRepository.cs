@@ -8,6 +8,10 @@ public interface ICourseRepository
     Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize);
     Task<List<Course>> GetDeletedAsync(int pageNumber, int pageSize);
     Task<int> CountAsync();
+
+    Task<List<Course>> GetClientPagedAsync(int pageNumber, int pageSize);
+    Task<int> CountClientAsync();
+
     Task<Course?> GetByIdAsync(int id);
     Task<Course?> GetByIdIncludingDeletedAsync(int id);
     Task<Course?> GetByIdWithStructureAsync(int id);

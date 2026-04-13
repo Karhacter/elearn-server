@@ -58,6 +58,23 @@ public class CourseService(ICourseRepository repository, IFileStorageService fil
         });
     }
 
+    public async Task<ServiceResult<PagedResult<CourseClientResponse>>> GetClientPagedAsync(int pageNumber, int pageSize)
+    {
+        pageNumber = Math.Max(1, pageNumber);
+        pageSize = Math.Max(1, pageSize);
+
+        var items = await repository.GetClientPagedAsync(pageNumber, pageSize);
+        var total = await repository.CountClientAsync();
+
+        return ServiceResult<PagedResult<CourseClientResponse>>.Ok(new PagedResult<CourseClientResponse>
+        {
+            Items = items.Select(c => c.ToClientResponse()).ToList(),
+            TotalCount = total,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        });
+    }
+
     public async Task<ServiceResult<CourseResponse>> GetByIdAsync(int id)
     {
         var course = await repository.GetByIdAsync(id);

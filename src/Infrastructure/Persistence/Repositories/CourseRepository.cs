@@ -11,7 +11,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         .Include(c => c.Instructor)
         .Include(c => c.LearningOutcomes)
         .Include(c => c.Requirements)
-        .Include(c => c.TargetAudiences);
+        .Include(c => c.TargetAudiences)
+        .AsSplitQuery();
 
     private IQueryable<Course> StructureQuery() => context.Courses
         .Include(c => c.Sections)
@@ -20,13 +21,27 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         .Include(c => c.Requirements)
         .Include(c => c.TargetAudiences);
 
+    // 1. Query tối giản: Chỉ lấy những gì hiển thị trên Card khóa học ở trang chủ
+    private IQueryable<Course> ClientSummaryQuery() => context.Courses
+        .Include(c => c.Genre)
+        .Include(c => c.Instructor)
+        .AsNoTracking();
+
+    // 2. Hàm lấy danh sách cho trang chủ (Cực nhanh)
+    public Task<List<Course>> GetClientPagedAsync(int pageNumber, int pageSize) =>
+        ClientSummaryQuery()
+        .OrderByDescending(c => c.CourseId) // Hiện khóa học mới nhất lên đầu
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+    public Task<int> CountClientAsync() => ClientSummaryQuery().CountAsync();
+
     public Task<List<Course>> GetAllAsync() => BaseQuery().AsNoTracking().ToListAsync();
 
-    public Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize) => BaseQuery().AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+    public Task<List<Course>> GetPagedAsync(int pageNumber, int pageSize) => BaseQuery().AsNoTracking().OrderBy(c => c.CourseId).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
     // Get Deleted Courses
-    public Task<List<Course>> GetDeletedAsync(int pageNumber, int pageSize) => BaseQuery().IgnoreQueryFilters().AsNoTracking().Where(c => c.IsDeleted).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-
+    public Task<List<Course>> GetDeletedAsync(int pageNumber, int pageSize) => BaseQuery().IgnoreQueryFilters().AsNoTracking().Where(c => c.IsDeleted).OrderBy(c => c.CourseId).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
     public Task<int> CountAsync() => context.Courses.CountAsync();
     public Task<Course?> GetByIdAsync(int id) => BaseQuery().SingleOrDefaultAsync(c => c.CourseId == id);

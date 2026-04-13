@@ -13,6 +13,11 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     public async Task<IActionResult> GetAllCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         FromResult(await courseService.GetAllAsync(page, pageSize));
 
+    [HttpGet("client")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetClientCourses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 4) =>
+        FromResult(await courseService.GetClientPagedAsync(pageNumber, pageSize));
+
     // get Deleted Course
     [HttpGet("deleted")]
     public async Task<IActionResult> GetDeletedCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) => FromResult(await courseService.GetDeletedAsync(page, pageSize));
@@ -84,6 +89,5 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
         FromResult(await courseService.UnpublishAsync(id));
 
 
-    // Add, update, and delete sections and lessons within a course
 
 }

@@ -30,6 +30,22 @@ public class CourseResponse
     public bool IsDeleted { get; set; }
 }
 
+public class CourseClientResponse
+{
+    public int CourseId { get; set; }
+    public string? Title { get; set; }
+    public string? Slug { get; set; }
+    public decimal Price { get; set; }
+    public decimal Discount { get; set; }
+    public string? Thumbnail { get; set; }
+    public string? Image { get; set; }
+    public int Duration { get; set; }
+    public int GenreId { get; set; }
+    public string? GenreName { get; set; }
+    public int InstructorId { get; set; }
+    public string? InstructorName { get; set; }
+}
+
 public class SectionResponse
 {
     public int SectionId { get; set; }

@@ -53,6 +53,22 @@ public static class EntityMappings
         IsDeleted = course.IsDeleted
     };
 
+    public static CourseClientResponse ToClientResponse(this Course course) => new()
+    {
+        CourseId = course.CourseId,
+        Title = course.Title,
+        Slug = course.Slug,
+        Price = course.Price,
+        Discount = course.Discount,
+        Thumbnail = course.Thumbnail,
+        Image = course.Image,
+        Duration = course.Duration,
+        GenreId = course.GenreId,
+        GenreName = course.Genre?.Name,
+        InstructorId = course.InstructorId,
+        InstructorName = course.Instructor?.FullName
+    };
+
     public static SectionResponse ToResponse(this CourseSection section) => new()
     {
         SectionId = section.SectionId,

@@ -39,4 +39,5 @@ public class Notification : BaseEntity
     /// are used to determine whether the record is logically deleted.
     /// </summary>
     public bool IsDeleted { get; set; } = false;
+
 }
