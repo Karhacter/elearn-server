@@ -1,4 +1,4 @@
-﻿using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 using elearn_server.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +8,7 @@ public class CartRepository(AppDbContext context) : ICartRepository
 {
     public Task<User?> GetUserAsync(int userId) => context.Users.SingleOrDefaultAsync(u => u.UserId == userId);
     public Task<Course?> GetCourseAsync(int courseId) => context.Courses.SingleOrDefaultAsync(c => c.CourseId == courseId);
-    public Task<Cart?> GetByUserIdAsync(int userId) => context.Carts.Include(c => c.CartItems).ThenInclude(i => i.Course).SingleOrDefaultAsync(c => c.UserId == userId);
+    public Task<Cart?> GetByUserIdAsync(int userId) => context.Carts.Include(c => c.CartItems).ThenInclude(i => i.Course).ThenInclude(c => c.Instructor).SingleOrDefaultAsync(c => c.UserId == userId);
     public Task AddAsync(Cart cart) => context.Carts.AddAsync(cart).AsTask();
     public Task<List<User>> GetUsersWithoutCartsAsync()
     {

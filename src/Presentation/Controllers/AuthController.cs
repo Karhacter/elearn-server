@@ -123,5 +123,6 @@ public class AuthController(IAuthService authService) : ApiControllerBase
         IsEssential = true,
         Path = "/"
     };
+
 }
 

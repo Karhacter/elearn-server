@@ -1,4 +1,4 @@
-﻿namespace elearn_server.Application.DTOs
+namespace elearn_server.Application.DTOs
 {
     public class CartItemDTO
     {
@@ -9,5 +9,6 @@
         public decimal Discount { get; set; }
         public string? Image { get; set; }
         public double Subtotal { get; set; }
+        public string? InstructorName { get; set; }
     }
 }

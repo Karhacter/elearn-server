@@ -8,6 +8,9 @@ public class Order : BaseEntity
     [Key]
     public int OrderID { set; get; }
 
+    [MaxLength(50)]
+    public string OrderCode { get; set; } = string.Empty;
+
     [MaxLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
     public string? Name { get; set; }
 
@@ -29,4 +32,14 @@ public class Order : BaseEntity
     public ICollection<OrderDetail>? OrderDetails { get; set; }
 
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
+
+    public decimal TotalAmount { get; set; }
+
+    public DateTime? PaidAt { get; set; }
+
+    public DateTime? CanceledAt { get; set; }
+
+    public ICollection<Payment>? Payments { get; set; }
+
+    public Invoice? Invoice { get; set; }
 }

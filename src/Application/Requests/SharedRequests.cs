@@ -208,11 +208,26 @@ public class PaymentCreateRequest
 
     [Required]
     [Range(0.01, double.MaxValue)]
-    public double Amount { get; set; }
+    public decimal Amount { get; set; }
 
     [Required]
     [MaxLength(20)]
     public string Method { get; set; } = string.Empty;
+}
+
+public class CheckoutRequest
+{
+    [MaxLength(100)]
+    public string? Name { get; set; }
+
+    [EmailAddress]
+    public string? Email { get; set; }
+
+    [MaxLength(20)]
+    public string? Phone { get; set; }
+
+    [MaxLength(255)]
+    public string? Address { get; set; }
 }
 
 public class EnrollmentCreateRequest

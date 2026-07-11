@@ -18,22 +18,44 @@ public class PostService : IPostService
         _context = context;
     }
 
-    public async Task<ServiceResult<List<PostResponse>>> GetAllPostsAsync()
+    public async Task<ServiceResult<List<PostResponse>>> GetAllPostsAsync(int page = 1, int limit = 10)
     {
         var posts = await _context.Set<Post>()
             .Include(p => p.Topic)
             .Where(p => !p.IsDeleted)
+            .Skip((page - 1) * limit)
+            .Take(limit)
             .ToListAsync();
         return ServiceResult<List<PostResponse>>.Ok(posts.Select(p => p.ToResponse()).ToList());
     }
 
-    public async Task<ServiceResult<List<PostResponse>>> GetPostsByTopicIdAsync(int topicId)
+    public async Task<ServiceResult<List<PostResponse>>> GetPostsByTopicIdAsync(int topicId, int page = 1, int limit = 10)
     {
         var posts = await _context.Set<Post>()
             .Include(p => p.Topic)
             .Where(p => p.TopicId == topicId && !p.IsDeleted)
+            .Skip((page - 1) * limit)
+            .Take(limit)
             .ToListAsync();
         return ServiceResult<List<PostResponse>>.Ok(posts.Select(p => p.ToResponse()).ToList());
+    }
+
+    public async Task<ServiceResult<PostResponse>> GetPostBySlug(string slug)
+    {
+        var query = _context.Set<Post>().Include(p => p.Topic).AsQueryable();
+        Post? post = null;
+        
+        if (int.TryParse(slug, out var id))
+        {
+            post = await query.FirstOrDefaultAsync(p => (p.Slug == slug || p.Id == id) && !p.IsDeleted);
+        }
+        else
+        {
+            post = await query.FirstOrDefaultAsync(p => p.Slug == slug && !p.IsDeleted);
+        }
+
+        if (post == null) return ServiceResult<PostResponse>.Fail(404, "Post not found.");
+        return ServiceResult<PostResponse>.Ok(post.ToResponse());
     }
 
     public async Task<ServiceResult<PostResponse>> GetPostByIdAsync(int id)
@@ -44,6 +66,7 @@ public class PostService : IPostService
         if (post == null) return ServiceResult<PostResponse>.Fail(404, "Post not found.");
         return ServiceResult<PostResponse>.Ok(post.ToResponse());
     }
+
 
     public async Task<ServiceResult<PostResponse>> CreatePostAsync(CreatePostRequest request)
     {
@@ -56,6 +79,7 @@ public class PostService : IPostService
             Content = request.Content,
             ThumbnailUrl = request.ThumbnailUrl,
             TopicId = request.TopicId,
+            Slug = await GenerateUniqueSlugAsync(request.Slug, request.Title),
             CreatedAt = DateTime.UtcNow
         };
         _context.Set<Post>().Add(post);
@@ -80,6 +104,7 @@ public class PostService : IPostService
         post.Content = request.Content;
         post.ThumbnailUrl = request.ThumbnailUrl;
         post.TopicId = request.TopicId;
+        post.Slug = await GenerateUniqueSlugAsync(request.Slug, request.Title, post.Id);
         post.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -97,5 +122,36 @@ public class PostService : IPostService
         post.DeletedAt = post.IsDeleted ? DateTime.UtcNow : null;
         await _context.SaveChangesAsync();
         return ServiceResult<bool>.Ok(true, "Post soft delete toggled.");
+    }
+
+    private async Task<string> GenerateUniqueSlugAsync(string? requestedSlug, string title, int? ignorePostId = null)
+    {
+        var baseSlug = NormalizeSlug(string.IsNullOrWhiteSpace(requestedSlug) ? title : requestedSlug);
+        if (string.IsNullOrWhiteSpace(baseSlug))
+        {
+            baseSlug = "post";
+        }
+
+        var slug = baseSlug;
+        var suffix = 1;
+        while (true)
+        {
+            var existing = await _context.Set<Post>().FirstOrDefaultAsync(p => p.Slug == slug && !p.IsDeleted);
+            if (existing is null || (ignorePostId.HasValue && existing.Id == ignorePostId.Value))
+            {
+                return slug;
+            }
+
+            slug = $"{baseSlug}-{suffix++}";
+        }
+    }
+
+    private static string NormalizeSlug(string value)
+    {
+        var slug = value.Trim().ToLowerInvariant();
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\s+", "-");
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"[^a-z0-9\-]", string.Empty);
+        slug = System.Text.RegularExpressions.Regex.Replace(slug, @"\-{2,}", "-").Trim('-');
+        return slug;
     }
 }

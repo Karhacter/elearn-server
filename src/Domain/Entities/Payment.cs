@@ -15,8 +15,12 @@ namespace elearn_server.Domain.Entities
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
-        [Required(ErrorMessage = "Course ID is required")]
-        public int CourseId { get; set; }
+        public int? OrderId { get; set; }
+
+        [ForeignKey("OrderId")]
+        public Order? Order { get; set; }
+
+        public int? CourseId { get; set; }
 
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
@@ -27,12 +31,39 @@ namespace elearn_server.Domain.Entities
 
         [Required(ErrorMessage = "Amount is required")]
         [Range(1, double.MaxValue, ErrorMessage = "Amount must be greater than zero")]
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
 
         [Required(ErrorMessage = "Payment method is required")]
-        [StringLength(20, ErrorMessage = "Method cannot exceed 20 characters")]
-        public string Method { get; set; } = "Credit Card";
+        [StringLength(50, ErrorMessage = "Method cannot exceed 50 characters")]
+        public string Method { get; set; } = "VNPay";
 
-        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid;
+        [StringLength(50)]
+        public string Gateway { get; set; } = "VNPay";
+
+        [StringLength(100)]
+        public string? GatewayTransactionNo { get; set; }
+
+        [StringLength(20)]
+        public string? GatewayResponseCode { get; set; }
+
+        [StringLength(50)]
+        public string? GatewayBankCode { get; set; }
+
+        public DateTime? GatewayPayDate { get; set; }
+
+        [StringLength(100)]
+        public string? IdempotencyKey { get; set; }
+
+        public string? RawGatewayPayload { get; set; }
+
+        public DateTime? PaidAt { get; set; }
+
+        public DateTime? FailedAt { get; set; }
+
+        public DateTime? CanceledAt { get; set; }
+
+        public DateTime? RefundedAt { get; set; }
+
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
     }
 }

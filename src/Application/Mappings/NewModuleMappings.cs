@@ -30,6 +30,7 @@ public static class NewModuleMappings
         Id = post.Id,
         Title = post.Title,
         Content = post.Content,
+        Slug = post.Slug,
         ThumbnailUrl = post.ThumbnailUrl,
         TopicId = post.TopicId,
         TopicName = post.Topic?.Name,
@@ -41,6 +42,7 @@ public static class NewModuleMappings
         Id = contact.Id,
         FullName = contact.FullName,
         Email = contact.Email,
+        Subject = contact.Subject,
         Message = contact.Message,
         Status = contact.Status,
         IsDeleted = contact.IsDeleted

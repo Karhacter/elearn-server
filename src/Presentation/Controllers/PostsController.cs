@@ -15,13 +15,13 @@ public class PostsController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPosts([FromQuery] int? topicId)
+    public async Task<IActionResult> GetPosts([FromQuery] int? topicId, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         if (topicId.HasValue)
         {
-            return FromResult(await _postService.GetPostsByTopicIdAsync(topicId.Value));
+            return FromResult(await _postService.GetPostsByTopicIdAsync(topicId.Value, page, limit));
         }
-        return FromResult(await _postService.GetAllPostsAsync());
+        return FromResult(await _postService.GetAllPostsAsync(page, limit));
     }
 
     [HttpGet("{id}")]
@@ -29,6 +29,10 @@ public class PostsController : ApiControllerBase
     {
         return FromResult(await _postService.GetPostByIdAsync(id));
     }
+
+    [HttpGet("slug/{slug}")]
+    public async Task<IActionResult> GetPostBySlug(string slug) => FromResult(await _postService.GetPostBySlug(slug));
+
 
     [HttpPost]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostRequest request)

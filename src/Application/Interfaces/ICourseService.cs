@@ -14,6 +14,7 @@ public interface ICourseService
     Task<ServiceResult<PagedResult<CourseResponse>>> GetDeletedAsync(int page, int pageSize);
     Task<ServiceResult<PagedResult<CourseClientResponse>>> GetClientPagedAsync(int pageNumber, int pageSize);
     Task<ServiceResult<CourseResponse>> GetByIdAsync(int id);
+    Task<ServiceResult<CourseResponse>> GetBySlugAsync(string slug);
     Task<ServiceResult<CourseResponse>> CreateAsync(CourseCreateRequest request);
     Task<ServiceResult<CourseResponse>> UpdateAsync(int id, CourseCreateRequest request);
     Task<ServiceResult<object>> DeleteAsync(int id);

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace elearn_server.Presentation.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "Student")]
+[Authorize]
 public class CartController(ICartService cartService) : ApiControllerBase
 {
     [HttpGet("{userId}")]

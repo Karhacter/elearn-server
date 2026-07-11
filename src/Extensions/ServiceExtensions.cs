@@ -35,6 +35,7 @@ public static class ServiceExtensions
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.Configure<AuthSecurityOptions>(configuration.GetSection(AuthSecurityOptions.SectionName));
         services.Configure<OllamaOptions>(configuration.GetSection(OllamaOptions.SectionName));
+        services.Configure<VnPayOptions>(configuration.GetSection(VnPayOptions.SectionName));
         return services;
     }
 

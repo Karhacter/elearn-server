@@ -26,7 +26,9 @@ public static class AuthExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtConfig["Issuer"],
                 ValidAudience = jwtConfig["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"]!))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"]!)),
+                NameClaimType = "unique_name",
+                RoleClaimType = "role"
             };
             options.Events = new JwtBearerEvents
             {

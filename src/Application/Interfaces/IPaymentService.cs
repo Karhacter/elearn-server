@@ -7,6 +7,9 @@ namespace elearn_server.Application.Interfaces;
 public interface IPaymentService
 {
     Task<ServiceResult<IReadOnlyCollection<PaymentResponse>>> GetByUserIdAsync(int userId);
+    Task<ServiceResult<IReadOnlyCollection<PaymentHistoryResponse>>> GetMyPaymentHistoryAsync(int userId);
+    Task<ServiceResult<VnPayIpnResponse>> HandleVnPayIpnAsync(IQueryCollection query);
+    Task<ServiceResult<PaymentReturnResponse>> GetVnPayReturnAsync(IQueryCollection query);
     Task<ServiceResult<PaymentResponse>> CreateAsync(PaymentCreateRequest request);
     Task<ServiceResult<object>> ConfirmPaymentAsync(int orderId);
 }

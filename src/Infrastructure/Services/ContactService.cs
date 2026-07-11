@@ -39,6 +39,7 @@ public class ContactService : IContactService
         {
             FullName = request.FullName,
             Email = request.Email,
+            Subject = request.Subject,
             Message = request.Message,
             Status = "Pending",
             CreatedAt = DateTime.UtcNow

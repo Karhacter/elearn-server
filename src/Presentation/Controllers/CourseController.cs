@@ -22,6 +22,9 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
     [HttpGet("deleted")]
     public async Task<IActionResult> GetDeletedCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10) => FromResult(await courseService.GetDeletedAsync(page, pageSize));
 
+    [HttpGet("client/{slug}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCourseBySlug(string slug) => FromResult(await courseService.GetBySlugAsync(slug));
 
     [HttpGet("detail/{id}")]
     [AllowAnonymous]

@@ -150,7 +150,8 @@ public class CartService(ICartRepository repository) : ICartService
             Price = ci.Course.Price,
             Discount = ci.Course.Discount,
             Image = ci.Course.Image,
-            Subtotal = (double)(ci.Quantity * ci.Course.Price)
+            Subtotal = (double)(ci.Quantity * ci.Course.Price),
+            InstructorName = ci.Course.Instructor?.FullName
         }).ToList() ?? new List<CartItemDTO>(),
         Total = cart.CartItems?.Where(ci => ci.Course is not null).Sum(ci => (double)(ci.Quantity * ci.Course!.Price)) ?? 0
     };

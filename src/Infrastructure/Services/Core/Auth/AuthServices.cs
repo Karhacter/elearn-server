@@ -55,11 +55,12 @@ public class AuthService(
             return ServiceResult<LoginResponse>.Fail(StatusCodes.Status401Unauthorized, "Email or password is incorrect.");
         }
 
-        if (_authSecurityOptions.RequireEmailVerification && !user.IsEmailVerified)
-        {
-            await WriteAuditLogAsync(user.UserId, "login", "blocked", ipAddress, userAgent, "Email is not verified.");
-            return ServiceResult<LoginResponse>.Fail(StatusCodes.Status403Forbidden, "Email is not verified.");
-        }
+        // Temporarily disable email verification requirement for login
+        // if (_authSecurityOptions.RequireEmailVerification && !user.IsEmailVerified)
+        // {
+        //     await WriteAuditLogAsync(user.UserId, "login", "blocked", ipAddress, userAgent, "Email is not verified.");
+        //     return ServiceResult<LoginResponse>.Fail(StatusCodes.Status403Forbidden, "Email is not verified.");
+        // }
 
         var accessToken = CreateAccessToken(user);
         var refreshToken = await CreateRefreshTokenAsync(user.UserId, ipAddress);

@@ -20,6 +20,9 @@ public class Post : BaseEntity
 
     public bool IsDeleted { get; set; } = false;
 
+    [MaxLength(200)]
+    public string Slug { get; set; } = string.Empty;
+
     // Navigation property
     public Topic Topic { get; set; } = null!;
 }

@@ -1,18 +1,34 @@
+using System.Collections.Specialized;
+using elearn_server.Application.Common;
+using elearn_server.Application.Interfaces;
+using elearn_server.Application.Mappings;
 using elearn_server.Application.Requests;
 using elearn_server.Application.Responses;
-using elearn_server.Application.Mappings;
 using elearn_server.Domain.Entities;
-using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
-using elearn_server.Application.Common;
 using elearn_server.Domain.Enums;
+using elearn_server.Infrastructure.Persistence.Repositories.IRepository;
 
-using elearn_server.Application.Interfaces;
 namespace elearn_server.Infrastructure.Services.Commerce;
 
 public class PaymentService(IPaymentRepository repository) : IPaymentService
 {
     public async Task<ServiceResult<IReadOnlyCollection<PaymentResponse>>> GetByUserIdAsync(int userId) =>
-        ServiceResult<IReadOnlyCollection<PaymentResponse>>.Ok((await repository.GetByUserIdAsync(userId)).Select(p => p.ToResponse()).ToList());
+        ServiceResult<IReadOnlyCollection<PaymentResponse>>.Ok(
+            (await repository.GetByUserIdAsync(userId))
+                .Select(p => p.ToResponse())
+                .ToList());
+
+    public async Task<ServiceResult<IReadOnlyCollection<PaymentHistoryResponse>>> GetMyPaymentHistoryAsync(int userId) =>
+        ServiceResult<IReadOnlyCollection<PaymentHistoryResponse>>.Fail(
+            StatusCodes.Status501NotImplemented,
+            "GetMyPaymentHistoryAsync is not implemented yet.");
+
+
+    public async Task<ServiceResult<VnPayIpnResponse>> HandleVnPayIpnAsync(IQueryCollection query) =>
+        ServiceResult<VnPayIpnResponse>.Fail(StatusCodes.Status501NotImplemented, "HandleVnPayIpnAsync is not implemented yet.");
+
+    public async Task<ServiceResult<PaymentReturnResponse>> GetVnPayReturnAsync(IQueryCollection query) =>
+        ServiceResult<PaymentReturnResponse>.Fail(StatusCodes.Status501NotImplemented, "GetVnPayReturnAsync is not implemented yet.");
 
     public async Task<ServiceResult<PaymentResponse>> CreateAsync(PaymentCreateRequest request)
     {

@@ -118,12 +118,14 @@ public static class EntityMappings
     public static OrderResponse ToResponse(this Order order) => new()
     {
         OrderId = order.OrderID,
+        OrderCode = order.OrderCode,
         Name = order.Name,
         Phone = order.Phone,
         Email = order.Email,
         Address = order.Address,
         UserId = order.user_id,
         Status = order.Status.ToString(),
+        TotalAmount = order.TotalAmount,
         Items = order.OrderDetails?.Select(ToResponse).ToList() ?? new List<OrderDetailResponse>()
     };
 
@@ -140,11 +142,44 @@ public static class EntityMappings
     {
         Id = payment.Id,
         UserId = payment.UserId,
+        OrderId = payment.OrderId,
+        OrderCode = payment.Order?.OrderCode,
         CourseId = payment.CourseId,
         CourseTitle = payment.Course?.Title,
         Amount = payment.Amount,
         Method = payment.Method,
-        PaymentDate = payment.PaymentDate
+        Gateway = payment.Gateway,
+        Status = payment.Status.ToString(),
+        GatewayTransactionNo = payment.GatewayTransactionNo,
+        PaymentDate = payment.PaymentDate,
+        PaidAt = payment.PaidAt
+    };
+
+    public static PaymentHistoryResponse ToHistoryResponse(this Payment payment) => new()
+    {
+        PaymentId = payment.Id,
+        OrderId = payment.OrderId ?? 0,
+        OrderCode = payment.Order?.OrderCode ?? string.Empty,
+        Amount = payment.Amount,
+        Method = payment.Method,
+        Gateway = payment.Gateway,
+        Status = payment.Status.ToString(),
+        PaymentDate = payment.PaymentDate,
+        PaidAt = payment.PaidAt,
+        Items = payment.Order?.OrderDetails?.Select(ToResponse).ToList() ?? new List<OrderDetailResponse>()
+
+    };
+
+    public static InvoiceResponse ToResponse(this Invoice invoice) => new()
+    {
+        Id = invoice.Id,
+        InvoiceNumber = invoice.InvoiceNumber,
+        OrderId = invoice.OrderId,
+        OrderCode = invoice.Order?.OrderCode ?? string.Empty,
+        UserId = invoice.UserId,
+        IssuedAt = invoice.IssuedAt,
+        TotalAmount = invoice.TotalAmount,
+        DownloadUrl = $"/api/invoices/{invoice.Id}/download"
     };
 
     public static EnrollmentResponse ToResponse(this Enrollment enrollment) => new()

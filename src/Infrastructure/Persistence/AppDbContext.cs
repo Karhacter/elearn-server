@@ -44,6 +44,7 @@ public class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
 
     public DbSet<Menu> Menus { get; set; }
     public DbSet<Contact> Contacts { get; set; }
@@ -57,6 +58,9 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Course>().Property(c => c.Price).HasColumnType("decimal(18,2)");
         modelBuilder.Entity<OrderDetail>().Property(od => od.Price).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Order>().Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Payment>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Invoice>().Property(i => i.TotalAmount).HasColumnType("decimal(18,2)");
 
         var sensitiveEntities = new[] { typeof(User), typeof(Course) };
 
@@ -238,15 +242,59 @@ public class AppDbContext : DbContext
             .Property(o => o.Status)
             .HasConversion<string>();
 
+        modelBuilder.Entity<Order>()
+            .HasIndex(o => o.OrderCode)
+            .IsUnique();
+
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status)
             .HasConversion<string>();
+
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Order)
+            .WithMany(o => o.Payments)
+            .HasForeignKey(p => p.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.OrderId)
+            .IsUnique()
+            .HasFilter("[OrderId] IS NOT NULL");
+
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.IdempotencyKey)
+            .IsUnique()
+            .HasFilter("[IdempotencyKey] IS NOT NULL");
+
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.GatewayTransactionNo)
+            .IsUnique()
+            .HasFilter("[GatewayTransactionNo] IS NOT NULL");
 
         // Payment - Course (One-to-Many)
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.Course)
             .WithMany(c => c.Payments)
             .HasForeignKey(p => p.CourseId);
+
+        modelBuilder.Entity<Invoice>()
+            .HasQueryFilter(i => !i.IsDeleted);
+
+        modelBuilder.Entity<Invoice>()
+            .HasOne(i => i.Order)
+            .WithOne(o => o.Invoice)
+            .HasForeignKey<Invoice>(i => i.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Invoice>()
+            .HasOne(i => i.User)
+            .WithMany()
+            .HasForeignKey(i => i.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Invoice>()
+            .HasIndex(i => i.InvoiceNumber)
+            .IsUnique();
 
         // Certificate - User (One-to-Many)
         modelBuilder.Entity<Certificate>()
